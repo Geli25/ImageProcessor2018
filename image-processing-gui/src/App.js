@@ -1,22 +1,25 @@
-import React, { Component } from 'react';
-import Welcome from './Input/Stateless/Welcome';
-import Instructions from './Input/Stateless/Instructions';
-import Upload from './Input/Stateful/SelectImages';
-import './App.css'
+import React, { Component } from 'react'; 
+import {Route, withRouter, Switch} from 'react-router-dom';
+import NavBar from './Navigation/NavBarWrapper';
+import Input from './Input/Input';
+import './App.css';
 
 class App extends Component {
-    state ={
-        loading: false,
-    }
     render() {
+        let allRoutes = (
+            <Switch>
+                <Route path="/" exact component={Input} />
+            </Switch>
+        );
+
         return (
-            <div className="App">
-            <Welcome />
-            <Instructions />
-            <Upload />
+            <div className="app">
+                <NavBar>
+                    {allRoutes}
+                </NavBar>
             </div>
         );
     }
 }
 
-export default App;
+export default withRouter(App);
