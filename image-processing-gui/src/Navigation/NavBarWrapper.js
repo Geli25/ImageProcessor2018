@@ -4,8 +4,9 @@ import './NavBarWrapper.css'
 
 const NavBar = (props) => (
     <div>
-        <ul>
+        <ul className="NavBar">
             <NavItem link="/">Input</NavItem>
+            <NavItem link="/results">Output</NavItem>
         </ul>
         {props.children}
     </div>
