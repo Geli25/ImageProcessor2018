@@ -2,3 +2,12 @@ div{
     margin:auto;
     text-align:center;
 }
+
+.NavBar{
+    list-style: none;
+}
+
+.NavBar li{
+    display:inline;
+    margin:20%;
+}
