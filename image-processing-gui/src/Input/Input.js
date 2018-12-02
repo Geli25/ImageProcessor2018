@@ -7,15 +7,14 @@ import Options from './Stateless/Options';
 
 class Input extends Component {
     state = {
-        loading: false,
-        sent: false,
         jsonData:{
             "files":[],
             "HE":true,
             "CS":false,
             "LC":false,
             "RV":false,
-            "time":null
+            "time":null,
+            "uuid":this.props.uuid,
         }
     }
     
@@ -30,12 +29,46 @@ class Input extends Component {
         })
     }
 
+    fileUpdate = (event) => {
+        let files = event.target.files;
+        this.setState(prevState=>{
+            return{
+                jsonData:{
+                    ...prevState.jsonData,
+                    "files":[]
+                }
+            }
+        },()=>{
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = () => {
+                    this.setState(prevState => {
+                        return {
+                            selected: true,
+                            jsonData: {
+                                ...prevState.jsonData,
+                                "files": [
+                                    ...prevState.jsonData["files"],
+                                    reader.result
+                                ]
+                            }
+                        }
+                    }, () => {
+                        console.log(this.state);
+                    })
+                }
+            }
+        })
+    }
+
     render() {
         let content = (
             <Fragment>
                 <Welcome />
                 <Instructions />
-                <SelectImages />
+                <SelectImages
+                    updateFile={this.fileUpdate} />
                 <Options 
                     toggle={this.optionToggle}
                     optionData={this.state.jsonData} />
@@ -45,7 +78,7 @@ class Input extends Component {
         
         if (this.state.sent===true){
             content = (
-                <Redirect to="/" />
+                <Redirect to="/results" />
             )
         }
 

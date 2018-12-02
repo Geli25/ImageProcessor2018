@@ -1,35 +1,14 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 
-class SelectImages extends Component {
-    state = {
-        selectedFiles:[]
-    }
-
-    fileChange = (event) => {
-        let files = event.target.files;
-        for (let file of files){
-            this.setState((prevState)=>{
-                return{
-                    selectedFiles:[...prevState.selectedFiles, file]
-                }
-            }, ()=>{
-                console.log(this.state.selectedFiles);
-            })
-        }
-    }
-
-    render() {
-        return (
-            <Fragment>
-                <input 
-                    type="file"  
-                    onChange={this.fileChange}
-                    accept=".jpg, .jpeg, .zip, .png, .tiff"
-                    multiple />
-                <br />
-            </Fragment>
-        );
-    }
-}
+const SelectImages = props =>(
+    <Fragment>
+        <input 
+            type="file"  
+            onChange={props.updateFile}
+            accept=".jpg, .jpeg, .zip, .png, .tiff"
+            multiple />
+        <br />
+    </Fragment>
+);
 
 export default SelectImages;

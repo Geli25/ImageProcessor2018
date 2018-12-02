@@ -6,12 +6,24 @@ import Output from './Output/Output';
 import './App.css';
 
 class App extends Component {
+    state = {
+        loading: false,
+        sent: false,
+        uuid: null
+    }
+
+    componentWillMount(){
+        const uuidv4 = require('uuid/v4');
+        let newUuid = uuidv4();
+        this.setState({ uuid: newUuid });
+    }
+
     render() {
         let allRoutes = (
             <Switch>
-                <Route path="/" exact component={Input} />
+                <Route path="/" exact component={() => <Input uuid={this.state.uuid} />} />
                 {/* for passing props */}
-                <Route path="/results" exact component={()=><Output />} />
+                <Route path="/results" exact component={() => <Output uuid={this.state.uuid} />} />
             </Switch>
         );
 
