@@ -1,19 +1,22 @@
 import React, { Component, Fragment } from 'react';
+import axios from 'axios';
+import {Line} from 'rc-progress';
 import {Redirect} from 'react-router-dom';
 import Welcome from './Stateless/Welcome';
 import Instructions from './Stateless/Instructions';
-import SelectImages from './Stateful/SelectImages';
+import SelectImages from './Stateless/SelectImages';
 import Options from './Stateless/Options';
 
 class Input extends Component {
     state = {
+        loading:false,
+        percentage:null,
         jsonData:{
             "files":[],
             "HE":true,
             "CS":false,
             "LC":false,
             "RV":false,
-            "time":null,
             "uuid":this.props.uuid,
         }
     }
@@ -45,7 +48,6 @@ class Input extends Component {
                 reader.onloadend = () => {
                     this.setState(prevState => {
                         return {
-                            selected: true,
                             jsonData: {
                                 ...prevState.jsonData,
                                 "files": [
@@ -54,15 +56,38 @@ class Input extends Component {
                                 ]
                             }
                         }
-                    }, () => {
-                        console.log(this.state);
                     })
                 }
             }
         })
     }
 
+    submitButton=()=>{
+        this.setState({loading:true},()=>{
+            console.log(this.state);
+        })
+        // axios.post('gs://bmetester-484d1.appspot.com',this.state.jsonData,{
+        //     onUploadProgress: progressEvent => {
+        //         let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
+        //         this.setState({percentage:progressPercent},()=>{
+        //             console.log(progressPercent);
+        //         });
+        //     }
+        // }).then(response=>{
+        //     this.setState({loading:false});
+        //     console.log(response);
+        // }).catch(err=>{
+        //     this.setState({loading:false});
+        //     console.log(err);
+        // })
+    }
+
     render() {
+        let disable = false;
+        if (this.state.jsonData["files"].length===0){
+            disable=true;
+        }
+
         let content = (
             <Fragment>
                 <Welcome />
@@ -72,7 +97,7 @@ class Input extends Component {
                 <Options 
                     toggle={this.optionToggle}
                     optionData={this.state.jsonData} />
-                <button>Submit</button>
+                {this.state.loading ? <Line style={{height:'20px'}} percent={this.state.percentage} strokeWidth="6" strokeColor="black" /> : <button disabled={disable} onClick={this.submitButton}>Submit</button>}
             </Fragment>
         );
         
