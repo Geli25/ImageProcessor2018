@@ -9,7 +9,7 @@ class App extends Component {
     state = {
         uuid: null,
         sent: false,
-        redirectActive:false,
+        // redirectActive:false,
         loading:false,
         filenames:[],
     }
@@ -20,7 +20,7 @@ class App extends Component {
         this.setState({
             uuid: newUuid,
             sent: false,
-            redirectActive: false,
+            // redirectActive: false,
             loading: false,
             filenames: [] }, () => console.log(this.state.uuid));
     }
@@ -34,7 +34,7 @@ class App extends Component {
     }
 
     updateFileNames=(names)=>{
-        this.setState({filenames:names, sent:true, redirectActive:true},()=>console.log(this.state))
+        this.setState({filenames:names, sent:true},()=>console.log(this.state))
     }
 
     // redirectFalse = () => {
@@ -56,7 +56,7 @@ class App extends Component {
                 <Route path="/" exact component={() => <Input 
                 sentStatus={this.state.sent}
                 keepFilenames={this.updateFileNames}
-                redirect={this.state.redirectActive}
+                // redirect={this.state.redirectActive}
                 fileNames={this.state.filenames}
                 uploading={this.loading}
                 notUploading={this.notLoading}
