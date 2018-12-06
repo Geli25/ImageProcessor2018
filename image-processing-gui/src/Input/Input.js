@@ -73,15 +73,14 @@ class Input extends Component {
     }
 
     submitButton=()=>{
-        let newData={
-            "uuid":this.props.uuid,
-            "HE":this.state.jsonData.HE,
-            "CS": this.state.jsonData.CS,
-            "LC": this.state.jsonData.LC,
-            "RV": this.state.jsonData.RV,
-        }
-
         if (this.props.sentStatus===true){
+            let newData = {
+                "uuid": this.props.uuid,
+                "HE": this.state.jsonData.HE,
+                "CS": this.state.jsonData.CS,
+                "LC": this.state.jsonData.LC,
+                "RV": this.state.jsonData.RV,
+            }
             this.setState({
                 loading: true},
             ()=>console.log(newData))
