@@ -1,9 +1,11 @@
 import React, { Component} from 'react';
 
 class Output extends Component {
-    state = {
-        sent: false
-    }
+
+    // componentDidMount(){
+    //     this.props.redirectOff();
+    //     console.log(this.props.redirectOff);
+    // }
 
     render() {
         return (

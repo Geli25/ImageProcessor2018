@@ -7,22 +7,64 @@ import './App.css';
 
 class App extends Component {
     state = {
-        loading: false,
-        uuid: null
+        uuid: null,
+        sent: false,
+        redirectActive:false,
+        loading:false,
+        filenames:[],
     }
 
-    componentWillMount(){
+    resetApp=()=>{
         const uuidv4 = require('uuid/v4');
         let newUuid = uuidv4();
-        this.setState({ uuid: newUuid });
+        this.setState({
+            uuid: newUuid,
+            sent: false,
+            redirectActive: false,
+            loading: false,
+            filenames: [] }, () => console.log(this.state.uuid));
     }
+
+    loading=()=>{
+        this.setState({loading:true})
+    }
+
+    notLoading=()=>{
+        this.setState({loading:false})
+    }
+
+    updateFileNames=(names)=>{
+        this.setState({filenames:names, sent:true, redirectActive:true},()=>console.log(this.state))
+    }
+
+    // redirectFalse = () => {
+    //     this.setState({ redirectActive: false })
+    // }
+
+    componentWillMount(){
+        this.resetApp();
+    }
+
+    // shouldComponentUpdate(_,nextState){
+    //     return nextState.redirectActive!==this.state.redirectActive;
+    // }
+
 
     render() {
         let allRoutes = (
             <Switch>
-                <Route path="/" exact component={() => <Input uuid={this.state.uuid} />} />
-                {/* for passing props */}
-                <Route path="/results" exact component={() => <Output uuid={this.state.uuid} />} />
+                <Route path="/" exact component={() => <Input 
+                sentStatus={this.state.sent}
+                keepFilenames={this.updateFileNames}
+                redirect={this.state.redirectActive}
+                fileNames={this.state.filenames}
+                uploading={this.loading}
+                notUploading={this.notLoading}
+                toggleSent={this.messageSent}
+                uuid={this.state.uuid} />} />
+                <Route path="/results" exact component={() => <Output 
+                // redirectOff={this.redirectFalse}
+                uuid={this.state.uuid} />} />
             </Switch>
         );
 
@@ -31,6 +73,10 @@ class App extends Component {
                 <NavBar>
                     {allRoutes}
                 </NavBar>
+                <br />
+                <button onClick={this.resetApp}>Reset session</button>
+                <br />
+                <br />
             </div>
         );
     }
