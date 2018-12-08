@@ -167,7 +167,11 @@ class Input extends Component {
         let disable = false;
         if (!this.props.sentStatus){
             if (this.state.jsonData["files"].length === 0 
-            || this.state.jsonData["files"].length > 10){
+            || this.state.jsonData["files"].length > 10 
+                || (!this.state.jsonData["HE"] 
+                && !this.state.jsonData["CS"] 
+                && !this.state.jsonData["RV"]
+                && !this.state.jsonData["LC"])){
                 disable=true;
             }
         }
