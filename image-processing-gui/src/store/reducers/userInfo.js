@@ -6,6 +6,7 @@ const initialState={
     uuid:null,
     redirectActive:false,
     sent:false,
+    resetRedirect:false,
     fileNames:[]
 }
 
@@ -17,7 +18,8 @@ const reducer=(curState=initialState,action)=>{
                 loading:false,
                 redirectActive:false,
                 sent:false,
-                fileNames:[]
+                fileNames:[],
+                resetRedirect:true
             })
         case actionTypes.SET_LOADING:
             return stateUpdater(curState,{
@@ -34,6 +36,11 @@ const reducer=(curState=initialState,action)=>{
         case actionTypes.UPDATE_FILENAMES:{
             return stateUpdater(curState,{
                 fileNames:action.fileNames
+            })
+        }
+        case actionTypes.SET_RESET:{
+            return stateUpdater(curState,{
+                resetRedirect:false
             })
         }
         default:

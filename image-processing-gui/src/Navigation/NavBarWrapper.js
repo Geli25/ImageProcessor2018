@@ -1,6 +1,8 @@
 import React from 'react';
+
 import NavItem from './NavItem';
 import './NavBarWrapper.css'
+import ResetButton from '../ResetButton';
 
 const NavBar = (props) => (
     <div>

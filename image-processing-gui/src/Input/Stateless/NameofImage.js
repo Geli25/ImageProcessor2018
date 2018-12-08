@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import * as actionCreators from '../../store/actions/selectedFiles';
 import {connect} from 'react-redux';
 
@@ -15,15 +15,15 @@ class NamesofImages extends Component{
 
     componentWillMount(){
         this.props.clearSelected();
-        if (this.props.allNames.length === 1) {
-            this.props.addSelected(this.props.allNames[0]);
+        for (let name of this.props.allNames) {
+            this.props.addSelected(name);
         }
     }
 
     render(){
-        let checked=null;
+        let disable=null;
         if (this.props.allNames.length===1){
-            checked=true;
+            disable=true;
         }
         return(
             this.props.allNames.map(name=>{
@@ -32,8 +32,8 @@ class NamesofImages extends Component{
                         <input
                             type="checkbox"
                             id={name}
-                            checked={checked}
-                            disabled={checked}
+                            defaultChecked={true}
+                            disabled={disable}
                             onChange={this.checkboxHandler} />
                         <label htmlFor="HE">{name}</label>
                     </li>
