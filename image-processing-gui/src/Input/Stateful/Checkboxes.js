@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import * as actionCreators from '../../store/actions/selectedFiles';
 import NamesofImages from './NameofImage';
-import './instruction2.css'
+import '../Stateless/instruction2.css'
 
 class Checkboxes extends Component {
     state = {

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import './instruction2.css'
-import Checkboxes from './Checkboxes';
+import Checkboxes from '../Stateful/Checkboxes';
 
 const Instruction2 = (props) => {
     return (
