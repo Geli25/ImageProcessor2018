@@ -11,7 +11,7 @@ const Instruction2 = (props) => {
             the 'Restart Session'button below.</p>
             <ul>
                 Files uploaded:
-                <NamesofImages allNames={props.names} />
+                <NamesofImages />
             </ul>
             <p>With these files, you can choose to reprocess uploaded files by reselecting
             the options below.</p>

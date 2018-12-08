@@ -1,4 +1,5 @@
-import React, { Fragment } from 'react';
+import React from 'react';
+import {connect} from 'react-redux';
 
 const NamesofImages = (props) => {
     return (
@@ -10,4 +11,10 @@ const NamesofImages = (props) => {
     );
 }
 
-export default NamesofImages;
+const mapStatetoProps=reduxState=>{
+    return{
+        allNames:reduxState.userInfo.fileNames
+    }
+}
+
+export default connect(mapStatetoProps)(NamesofImages);
