@@ -1,8 +1,11 @@
 import React, { Component} from 'react';
+import * as actionCreators from '../store/actions/userInfo';
+import {connect} from 'react-redux';
 
 class Output extends Component {
-    state = {
-        sent: false
+
+    componentDidMount(){
+        this.props.setRedirect(false);
     }
 
     render() {
@@ -14,4 +17,10 @@ class Output extends Component {
     }
 }
 
-export default Output;
+const mapDispatchtoProps=dispatch=>{
+    return{
+        setRedirect:(bool)=>dispatch(actionCreators.setRedirect(bool))
+    }
+}
+
+export default connect(null,mapDispatchtoProps)(Output);
