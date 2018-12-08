@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Route, withRouter, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import * as actionCreators from './store/actions/userInfo';
+import {clearSelected} from './store/actions/selectedFiles';
 import NavBar from './Navigation/NavBarWrapper';
 import Input from './Input/Input';
 import Output from './Output/Output';
@@ -17,6 +18,7 @@ class App extends Component {
         const uuidv4 = require('uuid/v4');
         let newUuid = uuidv4();
         this.props.resetApp(newUuid);
+        this.props.clearSelected();
         this.setState({uuid:newUuid})
         console.log(newUuid);
         if (this.state.uuid!==null){
@@ -53,7 +55,8 @@ class App extends Component {
 
 const mapDispatchtoProps=dispatch=>{
     return{
-        resetApp:(uuid)=>dispatch(actionCreators.resetApp(uuid))
+        resetApp:(uuid)=>dispatch(actionCreators.resetApp(uuid)),
+        clearSelected:()=>dispatch(clearSelected())
     }
 }
 

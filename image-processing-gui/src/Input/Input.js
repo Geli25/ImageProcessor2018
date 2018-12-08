@@ -81,11 +81,14 @@ class Input extends Component {
                 "CS": this.state.jsonData.CS,
                 "LC": this.state.jsonData.LC,
                 "RV": this.state.jsonData.RV,
+                "selectedFilename": this.props.selectedFiles,
             }
             this.props.setLoading(true);
             this.setState({
                 loading: true},
-            ()=>console.log(newData))
+            ()=>console.log(newData));
+            this.props.setRedirect(true);
+
         }
         else{
             this.setState({ loading: true }, () => {
@@ -95,7 +98,6 @@ class Input extends Component {
             this.props.sent();
             this.props.updateFileNames(this.state.fileNames);
             this.props.setRedirect(true);
-            console.log(this.props.redirectActive);
         }
     }
     // if (this.props.sentStatus===true){
@@ -107,6 +109,7 @@ class Input extends Component {
     //         "CS": this.state.jsonData.CS,
     //         "LC": this.state.jsonData.LC,
     //         "RV": this.state.jsonData.RV,
+    //         "selectedFilename": this.props.selectedFiles
     //     }
     //     axios.post('http://127.0.0.1:5000/new_data', newData, {
     //         onUploadProgress: progressEvent => {
@@ -118,6 +121,7 @@ class Input extends Component {
     //         this.setState({ loading: false }, () => {
     //             console.log(newData, response);
     //         });
+    //         this.props.setRedirect(true);
     //     }).catch(err => {
     //         this.props.setLoading(false);
     //         this.setState({ loading: false });
@@ -151,8 +155,15 @@ class Input extends Component {
 
     render() {
         let disable = false;
-        if (this.state.jsonData["files"].length===0 && this.props.sentStatus===false){
-            disable=true;
+        if (!this.props.sentStatus){
+            if (this.state.jsonData["files"].length === 0){
+                disable=true;
+            }
+        }
+        else if (this.props.sentStatus){
+            if (this.props.selectedFiles.length===0){
+                disable=true
+            }
         }
 
         let content = (
@@ -169,8 +180,6 @@ class Input extends Component {
                 {this.state.loading ? <Loader /> : <button disabled={disable} onClick={this.submitButton}>Submit</button>}
             </Fragment>
         );
-
-        console.log(this.props.redirectActive);
         if (this.props.redirectActive) {
             content = <Redirect to="/results" />
         }
@@ -188,7 +197,8 @@ const mapStatetoProps=reduxState=>{
         sentStatus:reduxState.userInfo.sent,
         uuid:reduxState.userInfo.uuid,
         redirectActive:reduxState.userInfo.redirect,
-        fileNames:reduxState.userInfo.fileNames
+        fileNames:reduxState.userInfo.fileNames,
+        selectedFiles:reduxState.selectedfiles.selectedFiles
     }
 }
 
