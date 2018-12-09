@@ -16,3 +16,4 @@ flask
 gunicorn
 timestring
 sqlalchemy
+Pillow
