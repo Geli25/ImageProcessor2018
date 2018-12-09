@@ -6,6 +6,8 @@ import {connect} from 'react-redux';
 import * as actionCreators from '../store/actions/userInfo';
 import * as actionCreator from '../store/actions/returnedData';
 import Loader from '../UI/Loader';
+import Results from './Results';
+
 
 class Output extends Component {
     state={
@@ -30,23 +32,25 @@ class Output extends Component {
     }
 
 
+
+
     render() {
         let content = (
-            <h2>The result of processing goes here.</h2>
+            <h2>You have not uploaded any files.</h2>
         )
         if (this.props.sentStatus&&this.state.loading){
             content=(
                 <Fragment>
-                <h2>Files are posted, getting your data...</h2>
-                <Loader />
+                    <h2>Getting your data...</h2>
+                    <Loader />
                 </Fragment>
             )
         }
         if (this.props.gotData){
             content=(
                 <Fragment>
-                    <h2>You have new requests posted, click below to refresh your results</h2>
-                    <button>Refresh Results</button>
+                    <h2>You have posted a new request, click below to refresh your results</h2>
+                    <button onClick={}>Refresh Results</button>
                 </Fragment>
             )
         }
@@ -56,6 +60,7 @@ class Output extends Component {
         return (
             <div>
                 {content}
+                {this.props.sentStatus ? <Results /> : null}
             </div>
         );
     }
