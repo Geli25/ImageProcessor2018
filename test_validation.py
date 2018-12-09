@@ -70,7 +70,7 @@ def test_validate(database, expected):
       "selectedFilename": ["1.jpg", "hh.zip/2.jpg"]
       },
      ["1.jpg", "2.jpg", "3.jpg", "tina.zip/4.jpg", "hh.zip/2.jpg",
-	 "angelina.zip/7.jpg"],
+      "angelina.zip/7.jpg"],
      [0, 4]
      ),
     ({"CS": True,
@@ -81,7 +81,7 @@ def test_validate(database, expected):
       "selectedFilename": ["2.jpg", "angelina.zip/7.jpg"]
       },
      ["1.jpg", "2.jpg", "3.jpg", "tina.zip/4.jpg", "hh.zip/2.jpg",
-	 "angelina.zip/7.jpg"],
+      "angelina.zip/7.jpg"],
      [1, 5])
 ])
 def test_second_validation(new_database, file_names, expected):
