@@ -43,20 +43,16 @@ def process_image(image, list_processing_method, actions):
     return output, actions, size
 
 
-if __name__== "__main__":
+if __name__ == "__main__":
     image = imread('test.jpg')
     print('image:', image.shape)
-    image = image[:,:,0]
+    image = image[:, :, 0]
     list_processing_method = ['CS']
     actions = [0, 0, 0, 0]
     output, actions, size = process_image(image, list_processing_method, actions)
     plt.subplot(1, 2, 1)
-    plt.imshow(image, interpolation='nearest',cmap='gray')
+    plt.imshow(image, interpolation='nearest', cmap='gray')
     plt.subplot(1, 2, 2)
-    plt.imshow(output, interpolation='nearest',cmap='gray')
+    plt.imshow(output, interpolation='nearest', cmap='gray')
     plt.show()
     print('actions:', actions, 'size', size)
-
-
-
-
