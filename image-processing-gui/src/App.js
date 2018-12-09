@@ -1,4 +1,4 @@
-import React, { Component } from 'react'; 
+import React, { Component, Fragment } from 'react'; 
 import {Route, withRouter, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
 import * as actionCreators from './store/actions/userInfo';
@@ -11,7 +11,7 @@ import ResetButton from './ResetButton';
 
 class App extends Component {
     state = {
-        uuid: null
+        uuid: null,
     }
 
     resetApp=()=>{
@@ -31,12 +31,16 @@ class App extends Component {
 
     render() {
         let allRoutes = (
+            <Fragment>
             <Switch>
                 <Route path="/" exact component={() => <Input 
                  />} />
                 <Route path="/results" exact component={() => <Output 
                 uuid={this.state.uuid} />} />
             </Switch>
+            <br />
+            <ResetButton reset={this.resetApp} />
+            </Fragment>
         );
 
         return (
@@ -45,7 +49,6 @@ class App extends Component {
                     {allRoutes}
                 </NavBar>
                 <br />
-                <ResetButton reset={this.resetApp} />
                 <br />
                 <br />
             </div>
@@ -56,7 +59,7 @@ class App extends Component {
 const mapDispatchtoProps=dispatch=>{
     return{
         resetApp:(uuid)=>dispatch(actionCreators.resetApp(uuid)),
-        clearSelected:()=>dispatch(clearSelected())
+        clearSelected:()=>dispatch(clearSelected()),
     }
 }
 

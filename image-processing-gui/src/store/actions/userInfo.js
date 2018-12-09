@@ -33,3 +33,9 @@ export const updateFileNames=(files)=>{
         fileNames:files
     }
 }
+
+export const setReset=()=>{
+    return{
+        type:actionTypes.SET_RESET
+    }
+}

@@ -1,6 +1,7 @@
 import React from 'react';
+
 import NavItem from './NavItem';
-import './NavBarWrapper.css'
+import './NavBarWrapper.css';
 
 const NavBar = (props) => (
     <div>

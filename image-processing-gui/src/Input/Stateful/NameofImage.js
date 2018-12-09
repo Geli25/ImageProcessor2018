@@ -15,14 +15,14 @@ class NamesofImages extends Component{
 
     componentWillMount(){
         this.props.clearSelected();
-        if (this.props.allNames.length === 1) {
+        if (this.props.allNames.length===1) {
             this.props.addSelected(this.props.allNames[0]);
         }
     }
 
     render(){
         let checked=null;
-        if (this.props.allNames.length===1){
+        if (this.props.allNames.length===1||this.props.all){
             checked=true;
         }
         return(

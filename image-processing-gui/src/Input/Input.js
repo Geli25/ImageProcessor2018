@@ -14,7 +14,6 @@ class Input extends Component {
 
     state = {
         loading:false,
-        fileNames:[],
         jsonData:{
             "files":[],
             "HE":true,
@@ -22,7 +21,12 @@ class Input extends Component {
             "LC":false,
             "RV":false,
             "uuid":this.props.uuid,
+            "fileNames": [],
         }
+    }
+
+    componentWillMount(){
+        this.props.setReset();
     }
     
     optionToggle=(option)=>{
@@ -41,19 +45,25 @@ class Input extends Component {
         console.log(files);
         this.setState(prevState=>{
             return{
-                fileNames:[],
                 jsonData:{
                     ...prevState.jsonData,
-                    "files":[]
+                    "files":[],
+                    "fileNames":[]
                 }
             }
         },()=>{
             for (let file of files) {
-                this.setState(prevState => (
-                    {
-                        fileNames: [...prevState.fileNames, file["name"]]
+                this.setState(prevState => {
+                    return {
+                        jsonData: {
+                            ...prevState.jsonData,
+                            "fileNames": [
+                                ...prevState.jsonData["fileNames"],
+                                file["name"]
+                            ]
+                        }
                     }
-                ));
+                });
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onloadend = () => {
@@ -96,7 +106,7 @@ class Input extends Component {
             })
             this.props.setLoading(true);
             this.props.sent();
-            this.props.updateFileNames(this.state.fileNames);
+            this.props.updateFileNames(this.state.jsonData.fileNames);
             this.props.setRedirect(true);
         }
     }
@@ -141,7 +151,7 @@ class Input extends Component {
     //         this.props.sent();
     //         this.props.setLoading(false);
     //         console.log(this.state.jsonData, response);
-    //         this.props.updateFileNames(this.state.fileNames);
+    //         this.props.updateFileNames(this.state.jsonData.fileNames);
     //         this.props.setRedirect(true);
     //     }).catch(err => {
     //         this.props.setLoading(false);
@@ -156,7 +166,12 @@ class Input extends Component {
     render() {
         let disable = false;
         if (!this.props.sentStatus){
-            if (this.state.jsonData["files"].length === 0){
+            if (this.state.jsonData["files"].length === 0 
+            || this.state.jsonData["files"].length > 10 
+                || (!this.state.jsonData["HE"] 
+                && !this.state.jsonData["CS"] 
+                && !this.state.jsonData["RV"]
+                && !this.state.jsonData["LC"])){
                 disable=true;
             }
         }
@@ -207,7 +222,8 @@ const mapDispatchtoProps=dispatch=>{
         setLoading: (bool) => dispatch(actionCreators.setLoading(bool)),
         sent: () => dispatch(actionCreators.sentTrue()),
         setRedirect: (bool) => dispatch(actionCreators.setRedirect(bool)),
-        updateFileNames: (files) => dispatch(actionCreators.updateFileNames(files))
+        updateFileNames: (files) => dispatch(actionCreators.updateFileNames(files)),
+        setReset: (bool) => dispatch(actionCreators.setReset(bool))
     }
 }
 
