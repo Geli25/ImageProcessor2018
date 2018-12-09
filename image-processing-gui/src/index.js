@@ -9,13 +9,14 @@ import './index.css';
 import App from './App';
 import userInfo from './store/reducers/userInfo';
 import selectedfiles from './store/reducers/selectedFiles';
+import returnedData from './store/reducers/returnedData';
 import * as serviceWorker from './serviceWorker';
 
 const composeEnhancers = (process.env.NODE_ENV === 'development'
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose);
 
 const rootReducer = combineReducers({
-    userInfo,selectedfiles
+    userInfo,selectedfiles,returnedData
 })
 
 const store = createStore(rootReducer, composeEnhancers(

@@ -39,3 +39,9 @@ export const setReset=()=>{
         type:actionTypes.SET_RESET
     }
 }
+
+export const gotData=()=>{
+    return{
+        type:actionTypes.GOT_DATA
+    }
+}

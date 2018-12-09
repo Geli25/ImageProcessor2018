@@ -12,7 +12,7 @@ const Instructions = (props) => {
                     *.zip files must contain images of the above format*
                 </li>
            </ul>
-           <p><b>You can only upload 10 files at a total of 20mb. </b></p>
+           <p><b>You can only upload 10 files at a total of 20mb per session.</b></p>
         </Fragment>
     );
 }
