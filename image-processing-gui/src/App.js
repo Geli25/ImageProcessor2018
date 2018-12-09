@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react'; 
 import {Route, withRouter, Switch} from 'react-router-dom';
 import {connect} from 'react-redux';
+import {confirmAlert} from 'react-confirm-alert';
+
 import * as actionCreators from './store/actions/userInfo';
 import {clearSelected} from './store/actions/selectedFiles';
 import NavBar from './Navigation/NavBarWrapper';
@@ -19,10 +21,30 @@ class App extends Component {
         let newUuid = uuidv4();
         this.props.resetApp(newUuid);
         this.props.clearSelected();
-        this.setState({uuid:newUuid})
+        this.setState({ uuid: newUuid })
         console.log(newUuid);
-        if (this.state.uuid!==null){
-        alert("Session reset successful!")};
+        if (this.state.uuid !== null) {
+            alert("Session reset successful!");
+        }
+    }
+
+    alertReset=()=>{
+        confirmAlert({
+            message: "Are you sure you want to reset this session? All your processed data will be lost.",
+            customUI: ({ title, message, onClose }) => (
+                <div className="resetUI">
+                    <div className="alertText">
+                        <h3>{message}</h3>
+                    </div>
+                    <div className="alertButton">
+                    <button onClick={()=>{
+                        onClose();
+                        this.resetApp();}}>Yes</button>
+                    <button onClick={onClose}>Cancel</button>
+                    </div>
+                </div>
+            )
+        })
     }
 
     componentWillMount() {
@@ -39,7 +61,7 @@ class App extends Component {
                 uuid={this.state.uuid} />} />
             </Switch>
             <br />
-            <ResetButton reset={this.resetApp} />
+            <ResetButton reset={this.alertReset} />
             </Fragment>
         );
 
@@ -48,9 +70,6 @@ class App extends Component {
                 <NavBar>
                     {allRoutes}
                 </NavBar>
-                <br />
-                <br />
-                <br />
             </div>
         );
     }
