@@ -12,4 +12,3 @@ pytest-pep8
 pytest-cov
 requests
 pyqt5
-PIL
