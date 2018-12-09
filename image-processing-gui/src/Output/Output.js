@@ -1,9 +1,11 @@
-import React, { Component} from 'react';
+import React, { Component, Fragment} from 'react';
 import {Redirect} from 'react-router-dom';
 import axios from 'axios';
+import {connect} from 'react-redux';
+
 import * as actionCreators from '../store/actions/userInfo';
 import * as actionCreator from '../store/actions/returnedData';
-import {connect} from 'react-redux';
+import Loader from '../UI/Loader';
 
 class Output extends Component {
     state={
@@ -12,8 +14,8 @@ class Output extends Component {
 
     componentWillMount(){
         if (this.props.sentStatus){
-            // axios
-            //set states
+            this.setState({loading:true});
+            //this.retrieveData();
         }
     }
 
@@ -21,13 +23,32 @@ class Output extends Component {
         this.props.setRedirect(false);
     }
 
+    retrieveData=()=>{
+        //axios get 
+        // axios
+        //set states in redux
+    }
+
 
     render() {
         let content = (
             <h2>The result of processing goes here.</h2>
         )
-        if (this.props.sentStatus){
-            content=<h2>Files are posted, getting your data...</h2>
+        if (this.props.sentStatus&&this.state.loading){
+            content=(
+                <Fragment>
+                <h2>Files are posted, getting your data...</h2>
+                <Loader />
+                </Fragment>
+            )
+        }
+        if (this.props.gotData){
+            content=(
+                <Fragment>
+                    <h2>You have new requests posted, click below to refresh your results</h2>
+                    <button>Refresh Results</button>
+                </Fragment>
+            )
         }
         if (this.props.resetRedirect){
             content=<Redirect to="/" />
@@ -45,10 +66,6 @@ const mapStatetoProps=reduxState=>{
         sentStatus:reduxState.userInfo.sent,
         resetRedirect: reduxState.userInfo.resetRedirect,
         hasData:reduxState.userInfo.gotData,
-        imagePairs:reduxState.returnedData.imagePairs,
-        imageSizes:reduxState.returnedData.imageSizes,
-        ProcessingTime: reduxState.returnedData.processingTime,
-        imageTypes:reduxState.returnedData.imageTypes
     }
 }
 
