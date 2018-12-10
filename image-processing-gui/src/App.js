@@ -9,6 +9,7 @@ import NavBar from './Navigation/NavBarWrapper';
 import Input from './Input/Input';
 import Output from './Output/Output';
 import './App.css';
+import {Button} from 'reactstrap';
 import ResetButton from './ResetButton';
 
 class App extends Component {
@@ -37,10 +38,10 @@ class App extends Component {
                         <h3>{message}</h3>
                     </div>
                     <div className="alertButton">
-                    <button onClick={()=>{
+                    <Button color="success" onClick={()=>{
                         onClose();
-                        this.resetApp();}}>Yes</button>
-                    <button onClick={onClose}>Cancel</button>
+                        this.resetApp();}}>Yes</Button>
+                    <Button color="danger" onClick={onClose}>Cancel</Button>
                     </div>
                 </div>
             )

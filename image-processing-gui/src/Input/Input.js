@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import axios from 'axios';
 import * as actionCreators from '../store/actions/userInfo';
 import Loader from './../UI/Loader';
+import {Button} from 'reactstrap';
 import {Redirect} from 'react-router-dom';
 import Welcome from './Stateless/Welcome';
 import Instructions from './Stateless/Instructions';
@@ -192,7 +193,7 @@ class Input extends Component {
 
                     toggle={this.optionToggle}
                     optionData={this.state.jsonData} />
-                {this.state.loading ? <Loader /> : <button disabled={disable} onClick={this.submitButton}>Submit</button>}
+                {this.state.loading ? <Loader /> : <Button color="success" disabled={disable} onClick={this.submitButton}>Submit</Button>}
             </Fragment>
         );
         if (this.props.redirectActive) {

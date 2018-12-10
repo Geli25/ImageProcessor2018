@@ -6,7 +6,7 @@ import './NavBarWrapper.css';
 const NavBar = (props) => (
     <div>
         <ul className="NavBar">
-            <NavItem link="/">Input</NavItem>
+            <NavItem link="/">Home</NavItem>
             <NavItem link="/results">Output</NavItem>
         </ul>
         {props.children}

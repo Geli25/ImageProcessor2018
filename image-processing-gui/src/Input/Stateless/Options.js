@@ -1,9 +1,10 @@
-import React, { Fragment } from 'react';
+import React from 'react';
+import './instruction2.css';
 
 const Options = props => {
     return (
-        <Fragment>
-            <h4>Choose your options for processing:</h4>
+        <div className="options">
+            <h5>Choose your options for processing:</h5>
             <input
                 type="checkbox"
                 checked={props.optionData.HE}
@@ -33,7 +34,7 @@ const Options = props => {
             <label htmlFor="RV">Reverse Video</label>
             <br />
             <br />
-        </Fragment>
+        </div>
     );
 }
 
