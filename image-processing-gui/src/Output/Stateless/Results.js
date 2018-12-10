@@ -6,8 +6,8 @@ import ProcessedImages from './ProcessedImages';
 const Results=props=>{
     return(
         <Fragment>
-            <h2>Your processed images are shown below:</h2>
             <p>This processing took a total of <b>{props.processingTime}</b></p>
+            <h2>Your processed images are shown below:</h2>
             <ProcessedImages download={props.download} />
         </Fragment >
     )

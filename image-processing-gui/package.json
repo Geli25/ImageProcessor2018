@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@data-ui/histogram": "0.0.74",
     "axios": "^0.18.0",
     "file-saver": "^2.0.0",
     "react": "^16.6.3",
@@ -12,6 +13,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1",
     "react-thunk": "^1.0.0",
+    "reactstrap": "^6.5.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "uuid": "^3.3.2"

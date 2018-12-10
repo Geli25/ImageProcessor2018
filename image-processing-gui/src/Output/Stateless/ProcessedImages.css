@@ -1,8 +1,20 @@
 .imagePairs{
-    margin-top:2%;
+    margin-top:5%;
     margin-bottom:0.5%;
 }
 
 .imagePairs img{
-    margin-left:2%;
+    margin-left:5%;
+    margin-right:4%;
+}
+
+.histograms{
+    margin-bottom:-30px;
+}
+
+.histogram{
+    margin-top:-40px;
+    display:inline-block;
+    width:300px;
+    height:250px;
 }
