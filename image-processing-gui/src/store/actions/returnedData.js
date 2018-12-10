@@ -9,7 +9,7 @@ export const updateImagePairs = (pairs) => {
 
 export const updateImageSizes = (sizes) => {
     return {
-        type: actionTypes.UPDATE_IMAGE_SIZE,
+        type: actionTypes.UPDATE_IMAGE_SIZES,
         imageSizes: sizes
     }
 }

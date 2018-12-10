@@ -23,7 +23,7 @@ const reducer = (curState = initialState, action) => {
             return stateUpdater(curState, {
                 processingTime:action.processingTime
             })
-        case actionTypes.UPDATE_IMAGE_SIZE:
+        case actionTypes.UPDATE_IMAGE_SIZES:
             return stateUpdater(curState, {
                 imageSizes:action.imageSizes
             })

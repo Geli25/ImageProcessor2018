@@ -1,11 +1,17 @@
+.eachGroup{
+    width:60%;
+    border-bottom:2px dotted grey;
+    padding-bottom:20px;
+}
+
 .imagePairs{
     margin-top:5%;
     margin-bottom:0.5%;
 }
 
 .imagePairs img{
-    margin-left:5%;
-    margin-right:4%;
+    margin-left:7%;
+    margin-right:7%;
 }
 
 .histograms{
@@ -15,6 +21,6 @@
 .histogram{
     margin-top:-40px;
     display:inline-block;
-    width:300px;
+    width:290px;
     height:250px;
 }

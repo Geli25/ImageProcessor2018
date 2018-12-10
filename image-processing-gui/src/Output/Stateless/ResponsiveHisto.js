@@ -5,6 +5,7 @@ const ResponsiveHistogram = withParentSize(({ parentWidth, parentHeight, ...rest
 
 return(
     <Histogram
+        ariaLabel="color"
         width={parentWidth}
         height={parentHeight}
         {...rest}
