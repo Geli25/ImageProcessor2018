@@ -8,7 +8,9 @@ import * as actionCreator from '../store/actions/returnedData';
 import Loader from '../UI/Loader';
 import Results from './Stateless/Results';
 import FileSaver from 'file-saver';
+import JSZip from 'jszip';
 
+let zip = new JSZip();
 
 class Output extends Component {
     state={
@@ -91,6 +93,15 @@ class Output extends Component {
 
     downloadClick = (img64, name) => {
         FileSaver.saveAs(img64, name);
+    }
+
+    downloadALL=(img64,name)=>{
+        zip.file(name,img64,{base64:true});
+        zip.generateAsync({type:"blob"}).then(
+            (content)=>{
+                FileSaver.saveAs(content,"processed_files.zip")
+            }
+        )
     }
 
     render() {
