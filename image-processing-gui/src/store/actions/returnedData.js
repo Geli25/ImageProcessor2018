@@ -14,10 +14,10 @@ export const updateImageSizes = (sizes) => {
     }
 }
 
-export const updateImageTypes = (types) => {
+export const updateImageNames = (types) => {
     return {
-        type: actionTypes.UPDATE_IMAGE_TYPES,
-        imageTypes: types
+        type: actionTypes.UPDATE_IMAGE_NAMES,
+        imageNames: types
     }
 }
 

@@ -40,8 +40,9 @@ export const setReset=()=>{
     }
 }
 
-export const gotData=()=>{
+export const gotData=(bool)=>{
     return{
-        type:actionTypes.GOT_DATA
+        type:actionTypes.GOT_DATA,
+        gotData:bool
     }
 }

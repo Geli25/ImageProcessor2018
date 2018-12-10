@@ -1,20 +1,21 @@
 import React, { Fragment } from 'react';
 import {connect} from 'react-redux';
+import ProcessedImages from './ProcessedImages';
 
-const Results = (props) => {
-    return (
+
+const Results=props=>{
+    return(
         <Fragment>
-            <h1>Result</h1>
-        </Fragment>
-    );
+            <h2>Your processed images are shown below:</h2>
+            <p>This processing took a total of [time]</p>
+            <ProcessedImages />
+        </Fragment >
+    )
 }
 
 const mapStatetoProps=reduxState=>{
     return{
-        imagePairs: reduxState.returnedData.imagePairs,
-        imageSizes: reduxState.returnedData.imageSizes,
-        ProcessingTime: reduxState.returnedData.processingTime,
-        imageTypes: reduxState.returnedData.imageTypes
+        ProcessingTime: reduxState.returnedData.processingTime
     }
 }
 

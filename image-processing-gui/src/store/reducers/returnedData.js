@@ -3,7 +3,7 @@ import stateUpdater from '../../utility/stateUpdater';
 
 const initialState = {
     imagePairs: [],
-    imageTypes: [],
+    imageNames: [],
     processingTime: null,
     imageSizes: []
 }
@@ -14,9 +14,9 @@ const reducer = (curState = initialState, action) => {
             return stateUpdater(curState, {
                 imagePairs:action.imagePairs
             })
-        case actionTypes.UPDATE_IMAGE_TYPES:
+        case actionTypes.UPDATE_IMAGE_NAMES:
             return stateUpdater(curState, {
-                imageTypes:action.imageTypes
+                imageNames:action.imageNames
             })
         case actionTypes.UPDATE_PROCESSING_TIME:
             return stateUpdater(curState, {
