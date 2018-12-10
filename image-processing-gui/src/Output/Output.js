@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import * as actionCreators from '../store/actions/userInfo';
 import * as actionCreator from '../store/actions/returnedData';
 import Loader from '../UI/Loader';
-import Results from './Results';
+import Results from './Stateless/Results';
 import FileSaver from 'file-saver';
 
 
