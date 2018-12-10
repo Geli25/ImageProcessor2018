@@ -100,8 +100,8 @@ def validate(database):
                 logging.error(file_name + "the uploaded file is broken\n")
                 data[7].append(file_name + "the uploaded file is broken")
             except Exception as e:
-                logging.error(file_name + "the uploaded file is broken" + e
-                              + "\n")
+                logging.error(file_name + "the uploaded file is broken" +
+                              e + "\n")
                 data[7].append(file_name + "the uploaded file is broken\n")
     for x in range(0, len(data[0])):
         data[3].append(x)
