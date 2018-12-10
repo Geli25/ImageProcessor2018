@@ -51,8 +51,8 @@ const HistogramGroup = props => {
                         kernel="parabolic"
                         rawData={props.histogram[0][1] /* or binnedData={...} */}
                     />
-                    <XAxis />
-                    <YAxis />
+                    <XAxis label="RGB Level" />
+                    <YAxis label="Pixels"/>
                 </ResponsiveHistogram>
             </div>
 
@@ -83,8 +83,8 @@ const HistogramGroup = props => {
                         kernel="parabolic"
                         rawData={props.histogram[1] /* or binnedData={...} */}
                     />
-                    <XAxis />
-                    <YAxis />
+                    <XAxis label="Intensity" />
+                    <YAxis label="Pixels"/>
                 </ResponsiveHistogram>
             </div>
         </div>
