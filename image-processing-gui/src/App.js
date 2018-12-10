@@ -62,6 +62,8 @@ class App extends Component {
             </Switch>
             <br />
             <ResetButton reset={this.alertReset} />
+            <br />
+            <br />
             </Fragment>
         );
 
