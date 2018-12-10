@@ -30,4 +30,6 @@ ul{
 .alertButton button{
     margin-right:2.5%;
     margin-left:2.5%;
+	color:blue;
+	background-color: red;
 }
