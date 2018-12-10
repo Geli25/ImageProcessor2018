@@ -5,7 +5,8 @@ const initialState = {
     imagePairs: [],
     imageNames: [],
     processingTime: null,
-    imageSizes: []
+    imageSizes: [],
+    histograms:[]
 }
 
 const reducer = (curState = initialState, action) => {
@@ -25,6 +26,10 @@ const reducer = (curState = initialState, action) => {
         case actionTypes.UPDATE_IMAGE_SIZE:
             return stateUpdater(curState, {
                 imageSizes:action.imageSizes
+            })
+        case actionTypes.UPDATE_HISTOGRAMS:
+            return stateUpdater(curState,{
+                histograms:action.histograms
             })
         default:
             return curState;

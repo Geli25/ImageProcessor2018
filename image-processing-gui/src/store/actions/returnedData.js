@@ -27,3 +27,10 @@ export const updateProcessingTime = (time) => {
         processingTime: time
     }
 }
+
+export const updateHistograms=(histograms)=>{
+    return{
+        type:actionTypes.UPDATE_HISTOGRAMS,
+        histograms:histograms
+    }
+}
