@@ -7,15 +7,15 @@ const Results=props=>{
     return(
         <Fragment>
             <h2>Your processed images are shown below:</h2>
-            <p>This processing took a total of [time]</p>
-            <ProcessedImages />
+            <p>This processing took a total of <b>{props.processingTime}</b></p>
+            <ProcessedImages download={props.download} />
         </Fragment >
     )
 }
 
 const mapStatetoProps=reduxState=>{
     return{
-        ProcessingTime: reduxState.returnedData.processingTime
+        processingTime: reduxState.returnedData.processingTime
     }
 }
 
