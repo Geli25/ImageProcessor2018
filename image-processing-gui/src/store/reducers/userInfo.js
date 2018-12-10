@@ -47,7 +47,7 @@ const reducer=(curState=initialState,action)=>{
         }
         case actionTypes.GOT_DATA:{
             return stateUpdater(curState,{
-                gotData:true
+                gotData:action.gotData
             })
         }
         default:

@@ -151,7 +151,7 @@ class Input extends Component {
     //         this.props.sent();
     //         this.props.setLoading(false);
     //         console.log(this.state.jsonData, response);
-    //         this.props.updateFileNames(this.state.jsonData.fileNames);
+    //         this.props.updateFileNames(response);
     //         this.props.setRedirect(true);
     //     }).catch(err => {
     //         this.props.setLoading(false);
@@ -223,7 +223,8 @@ const mapDispatchtoProps=dispatch=>{
         sent: () => dispatch(actionCreators.sentTrue()),
         setRedirect: (bool) => dispatch(actionCreators.setRedirect(bool)),
         updateFileNames: (files) => dispatch(actionCreators.updateFileNames(files)),
-        setReset: (bool) => dispatch(actionCreators.setReset(bool))
+        setReset: (bool) => dispatch(actionCreators.setReset(bool)),
+        gotData:(bool)=>dispatch(actionCreators.gotData(bool))
     }
 }
 

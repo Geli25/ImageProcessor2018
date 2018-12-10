@@ -31,7 +31,7 @@ class App extends Component {
     alertReset=()=>{
         confirmAlert({
             message: "Are you sure you want to reset this session? All your processed data will be lost.",
-            customUI: ({ title, message, onClose }) => (
+            customUI: ({ message, onClose }) => (
                 <div className="resetUI">
                     <div className="alertText">
                         <h3>{message}</h3>

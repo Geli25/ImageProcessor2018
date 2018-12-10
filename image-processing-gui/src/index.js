@@ -19,7 +19,7 @@ const rootReducer = combineReducers({
     userInfo,selectedfiles,returnedData
 })
 
-const store = createStore(rootReducer, compose(
+const store = createStore(rootReducer, composeEnhancers(
     applyMiddleware(thunk)
 ));
 
