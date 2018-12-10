@@ -44,7 +44,8 @@ def test_traverse_dir(path, my_data, name, expected):
 
 def read_file_as_b64(image_path):
     with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read())
+        base64_bytes = base64.b64encode(image_file.read())
+    return base64_bytes.decode('utf-8')
 
 
 @pytest.mark.parametrize("database, expected", [

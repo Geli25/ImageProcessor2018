@@ -26,8 +26,8 @@ def un_zip(file_name):
 
 def image_turn_grey(image_file, image_type):
     if type(image_file) == bytes:
-        image_bytes = base64.b64decode(image_file)
-        image_file = io.BytesIO(image_bytes)
+        # image_bytes = base64.b64decode(image_file)
+        image_file = io.BytesIO(image_file)
     img = Image.open(image_file)
     img = img.convert('L')
     img_byte_arr = io.BytesIO()
@@ -82,27 +82,29 @@ def validate(database):
                     zip_file.write(image_bytes)
                     dir_name = un_zip(dir_str)
                 traverse_dir(dir_name, data, file_name)
-                shutil.rmtree(os.path.splitext(file_name)[0] + "_files")
-                os.remove(dir_str)
+                # shutil.rmtree(os.path.splitext(file_name)[0] + "_files")
+                # os.remove(dir_str)
             except OSError:
-                logging.error(file_name + "the uploaded file is broken\n")
-                data[7].append(file_name + "the uploaded file is broken")
+                logging.error(file_name + " the uploaded file is broken\n")
+                data[7].append(file_name + " the uploaded file is broken")
             except Exception as e:
-                logging.error(file_name + "the uploaded file is broken" +
+                logging.error(file_name + " the uploaded file is broken" +
                               e + "\n")
-                data[7].append(file_name + "the uploaded file is broken")
+                data[7].append(file_name + " the uploaded file is broken")
         else:
             try:
-                data[0].append(image_turn_grey(binary_image, data_type))
+                image_bytes = base64.b64decode(binary_image)
+                print(type(image_bytes))
+                data[0].append(image_turn_grey(image_bytes, data_type))
                 data[1].append(data_type)
                 data[2].append(file_name)
             except OSError:
-                logging.error(file_name + "the uploaded file is broken\n")
-                data[7].append(file_name + "the uploaded file is broken")
+                logging.error(file_name + " the uploaded file is broken\n")
+                data[7].append(file_name + " the uploaded file is broken")
             except Exception as e:
-                logging.error(file_name + "the uploaded file is broken" +
+                logging.error(file_name + " the uploaded file is broken" +
                               e + "\n")
-                data[7].append(file_name + "the uploaded file is broken\n")
+                data[7].append(file_name + " the uploaded file is broken\n")
     for x in range(0, len(data[0])):
         data[3].append(x)
     return data
@@ -124,5 +126,11 @@ def second_validation(new_database, file_names):
             new_data[0].append(file_names.index(image_name))
         except ValueError:
             logging.error(image_name + ": this image is not stored.\n")
-            new_data[4].append(image_name + ":Can not find this image")
+            new_data[4].append(image_name + ": Can not find this image")
     return new_data
+
+
+def read_file_as_b64(image_path):
+    with open(image_path, "rb") as image_file:
+        base64_bytes = base64.b64encode(image_file.read())
+    return base64_bytes.decode('utf-8')
