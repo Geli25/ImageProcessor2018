@@ -95,13 +95,18 @@ class Output extends Component {
         FileSaver.saveAs(img64, name);
     }
 
-    downloadALL=(img64,name)=>{
-        zip.file(name,img64,{base64:true});
-        zip.generateAsync({type:"blob"}).then(
-            (content)=>{
-                FileSaver.saveAs(content,"processed_files.zip")
+    addToZip=(img64,name)=>{
+        console.log(name,img64);
+        zip.file("processed_"+name,img64,{base64:true});
+    }
+
+    downloadAll=()=>{
+        console.log("download all")
+        zip.generateAsync({type: "blob"}).then(
+            (content) => {
+                FileSaver.saveAs(content, "processed_files.zip");
             }
-        )
+        );
     }
 
     render() {
@@ -131,7 +136,7 @@ class Output extends Component {
                 {content}
                 {this.props.sentStatus
                     &&!this.state.loading 
-                    ? <Results download={this.downloadClick} /> : null}
+                    ? <Results download={this.downloadClick} zip={this.addToZip} all={this.downloadAll} /> : null}
             </div>
         );
     }

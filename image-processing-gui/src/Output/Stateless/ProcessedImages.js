@@ -12,7 +12,8 @@ const ProcessedImages=props=>{
             let name = props.imageNames[index];
             let size = props.imageSizes[index];
             let histogram=props.histograms[index];
-            // let histogram=props.histograms[index];
+            let b64=pair[1].substr(pair[1].indexOf(','));
+            props.zip(b64,name);
             return(
                 <div className="eachGroup" key={Math.random()}>
                     {/* Images */}

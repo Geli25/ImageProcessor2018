@@ -8,7 +8,8 @@ const Results=props=>{
         <Fragment>
             <p>This processing took a total of <b>{props.processingTime}</b></p>
             <h2>Your processed images are shown below:</h2>
-            <ProcessedImages download={props.download} />
+            <button onClick={props.all}>Download all processed files</button>
+            <ProcessedImages zip={props.zip} download={props.download} />
         </Fragment >
     )
 }
