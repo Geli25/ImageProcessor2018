@@ -22,7 +22,9 @@ const ProcessedImages=props=>{
                     <HistogramGroup histogram={histogram} />
 
                     {/* Download Button */}
+                    <div className="dlButton">
                     <button type="button" onClick={() => props.download(pair[1], "processed_"+name)}>Download processed image</button>
+                    </div>
                 </div >
             )
         }
