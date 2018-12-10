@@ -30,9 +30,12 @@ def test_image_turn_grey(image_file, image_type):
 
 
 @pytest.mark.parametrize("path, my_data, name, expected", [
-    ("test_resource/traverse/test1", [[], [], [], [], [], [], [], []], "hh", 7),
-    ("test_resource/traverse/test2", [[], [], [], [], [], [], [], []], "angelina", 6),
-    ("test_resource/traverse/test3", [[], [], [], [], [], [], [], []], "Tina", 8),
+    ("test_resource/traverse/test1", [[], [], [], [], [], [], [], []],
+     "hh", 7),
+    ("test_resource/traverse/test2", [[], [], [], [], [], [], [], []],
+     "angelina", 6),
+    ("test_resource/traverse/test3", [[], [], [], [], [], [], [], []],
+     "Tina", 8),
     ])
 def test_traverse_dir(path, my_data, name, expected):
     traverse_dir(path, my_data, name)
