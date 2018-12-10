@@ -53,13 +53,14 @@ def traverse_dir(path, my_data, name):
                     my_data[2].append(name + "/" + file)
                 else:
                     logging.warning(in_file + " does not have an image type\n")
+                    my_data[7].append(in_file + " does not have an image type")
         else:
             traverse_dir(in_file, my_data, name + "/" + file)
 
 
 def validate(database):
     update_time = dt.datetime.now()
-    data = [[], [], [], [], [], update_time, database["uuid"]]
+    data = [[], [], [], [], [], update_time, database["uuid"], []]
     if database["CS"]:
         data[4].append("CS")
     if database["HE"]:
@@ -84,18 +85,22 @@ def validate(database):
                 shutil.rmtree(os.path.splitext(file_name)[0] + "_files")
                 os.remove(dir_str)
             except OSError:
-                logging.error(file_name + "the uploaded file is broken")
+                logging.error(file_name + "the uploaded file is broken\n")
+                data[7].append(file_name + "the uploaded file is broken")
             except Exception as e:
-                logging.error(file_name + "the uploaded file is broken" + e)
+                logging.error(file_name + "the uploaded file is broken" + e + "\n")
+                data[7].append(file_name + "the uploaded file is broken")
         else:
             try:
                 data[0].append(image_turn_grey(binary_image, data_type))
                 data[1].append(data_type)
                 data[2].append(file_name)
             except OSError:
-                logging.error(file_name + "the uploaded file is broken")
+                logging.error(file_name + "the uploaded file is broken\n")
+                data[7].append(file_name + "the uploaded file is broken")
             except Exception as e:
-                logging.error(file_name + "the uploaded file is broken" + e)
+                logging.error(file_name + "the uploaded file is broken" + e + "\n")
+                data[7].append(file_name + "the uploaded file is broken\n")
     for x in range(0, len(data[0])):
         data[3].append(x)
     return data
@@ -103,7 +108,7 @@ def validate(database):
 
 def second_validation(new_database, file_names):
     update_time = dt.datetime.now()
-    new_data = [[], [], update_time, new_database["uuid"]]
+    new_data = [[], [], update_time, new_database["uuid"], []]
     if new_database["CS"]:
         new_data[1].append("CS")
     if new_database["HE"]:
@@ -117,4 +122,5 @@ def second_validation(new_database, file_names):
             new_data[0].append(file_names.index(image_name))
         except ValueError:
             logging.error(image_name + ": this image is not stored.\n")
+            new_data[4].append(image_name + ":Can not find this image")
     return new_data
