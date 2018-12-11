@@ -59,8 +59,10 @@ def traverse_dir(path, my_data, name):
                     my_data[1].append(file_type)
                     my_data[2].append(add_name(my_data, name + "/" + file, 0))
                 else:
-                    logging.warning(in_file + " does not have an image type\n")
-                    my_data[7].append(in_file + " does not have an image type")
+                    logging.warning(in_file +
+                                    " does not have an image type\n")
+                    my_data[7].append(in_file +
+                                      " does not have an image type")
         else:
             traverse_dir(in_file, my_data, name + "/" + file)
 
@@ -69,11 +71,12 @@ def add_name(access, file_name, i):
     try:
         access[2].index(file_name)
         if i == 0:
-            add_name(access, file_name+"({})".format(i+1), i+1)
+            add_name(access, file_name + "({})".format(i + 1), i + 1)
         else:
             index = file_name.find("(")
-            file_name = file_name[:index+1] + "{}".format(i+1) + file_name[index+2:]
-            add_name(access, file_name, i+1)
+            file_name = file_name[:index + 1] + "{}".format(
+                i + 1) + file_name[index + 2:]
+            add_name(access, file_name, i + 1)
     except ValueError:
         access[2].append(file_name)
 
