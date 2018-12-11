@@ -103,7 +103,10 @@ class Output extends Component {
 
     render() {
         let content = (
+            <Fragment>
+            <br />
             <h4>Upload files from the "Input" page to begin</h4>
+            </Fragment>
         )
         if (this.props.sentStatus&&this.state.loading){
             content=(
