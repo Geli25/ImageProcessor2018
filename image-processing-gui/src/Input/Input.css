@@ -30,50 +30,7 @@ ul{
 }
 
 
-.alertButton button{
-  background:#1AAB8A;
-  color:#fff;
-  border:10px;
-  position:relative;
-  height:40px;
-  width:160px;
-  font-size:1.6em;
-  padding:0 2em;
-  cursor:pointer;
-  transition:800ms ease all;
-  outline:none;
-  box-shadow: #fff 0 0px 2px 2px inset;
-  Border-radius: 30px;
-  margin-right:50px;
-  margin-left:50px;
-}
-.alertButton button:hover{
-  background:#fff;
-  color:#1AAB8A;
-}
-.alertButton button:before,.alertButton button:after{
-  content:'';
-  position:absolute;
-  top:0;
-  right:0;
-  height:2px;
-  width:0;
-  background: #1AAB8A;
-  transition:400ms ease all;
-}
-.alertButton button:after{
-  right:inherit;
-  top:inherit;
-  left:0;
-  bottom:0;
-}
-.alertButton button:hover:before,button:hover:after{
-  width:100%;
-  transition:800ms ease all;
-}
-
-
-.reset button {
+.submit button {
     background-color: white;
   color: black;
   border: 2px solid #1AAB8A; 
@@ -81,8 +38,10 @@ ul{
   -webkit-transition-duration: 0.4s; /* Safari */
   transition-duration: 0.4s;
   Border-radius: 30px;
+  font-size:1.6em;
+	font:lato;
 }
-.reset button:hover {
+.submit button:hover {
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
   background-color: #1AAB8A; /* Green */
   color: white;

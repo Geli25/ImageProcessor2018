@@ -9,6 +9,7 @@ import Instructions from './Stateless/Instructions';
 import SelectImages from './Stateless/SelectImages';
 import Options from './Stateless/Options';
 import Instruction2 from './Stateless/Instruction2';
+import './Input.css';
 
 class Input extends Component {
 
@@ -192,7 +193,7 @@ class Input extends Component {
 
                     toggle={this.optionToggle}
                     optionData={this.state.jsonData} />
-                {this.state.loading ? <Loader /> : <button disabled={disable} onClick={this.submitButton}>Submit</button>}
+                {this.state.loading ? <Loader /> : <button className = "button" disabled={disable} onClick={this.submitButton}>Submit</button>}
             </Fragment>
         );
         if (this.props.redirectActive) {
