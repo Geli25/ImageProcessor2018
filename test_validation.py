@@ -103,3 +103,16 @@ def test_validate(database, expected):
 def test_second_validation(new_database, file_names, expected):
     response = second_validation(new_database, file_names)
     assert response[0] == expected
+
+
+@pytest.mark.parametrize("access, file_name, expected", [
+    ([[], [], ["hh", "kk", "jj"], [], [], [], [], [], []],
+     "hh", "hh(1)"),
+    ([[], [], ["hh", "kk", "jj"], [], [], [], [], [], []],
+     "angelina", "angelina"),
+    ([[], [], ["hh", "kk", "jj", "kk(1)"], [], [], [], [], [], []],
+     "kk", "kk(2)"),
+    ])
+def test_add_name(access, file_name, expected):
+    add_name(access, file_name, 0)
+    assert access[2][-1] == expected
