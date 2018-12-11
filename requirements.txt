@@ -17,3 +17,4 @@ gunicorn
 timestring
 sqlalchemy
 Pillow
+psycopg2
