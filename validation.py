@@ -26,7 +26,6 @@ def un_zip(file_name):
 
 def image_turn_grey(image_file, image_type):
     if type(image_file) == bytes:
-        # image_bytes = base64.b64decode(image_file)
         image_file = io.BytesIO(image_file)
     img = Image.open(image_file)
     img = img.convert('L')
@@ -35,6 +34,13 @@ def image_turn_grey(image_file, image_type):
         image_type = 'JPEG'
     img.save(img_byte_arr, image_type)
     return base64.b64encode(img_byte_arr.getvalue())
+
+
+def origin_image(image_file):
+    if type(image_file) == bytes:
+        return base64.b64encode(image_file)
+    with open(image_file, "rb") as image_file:
+        return base64.b64encode(image_file.read())
 
 
 def traverse_dir(path, my_data, name):
@@ -49,6 +55,7 @@ def traverse_dir(path, my_data, name):
             else:
                 if file_type in all_type:
                     my_data[0].append(image_turn_grey(in_file, file_type))
+                    my_data[8].append(origin_image(in_file))
                     my_data[1].append(file_type)
                     my_data[2].append(name + "/" + file)
                 else:
@@ -60,7 +67,7 @@ def traverse_dir(path, my_data, name):
 
 def validate(database):
     update_time = dt.datetime.now()
-    data = [[], [], [], [], [], update_time, database["uuid"], []]
+    data = [[], [], [], [], [], update_time, database["uuid"], [], []]
     if database["CS"]:
         data[4].append("CS")
     if database["HE"]:
@@ -94,8 +101,8 @@ def validate(database):
         else:
             try:
                 image_bytes = base64.b64decode(binary_image)
-                print(type(image_bytes))
                 data[0].append(image_turn_grey(image_bytes, data_type))
+                data[8].append(origin_image(image_bytes))
                 data[1].append(data_type)
                 data[2].append(file_name)
             except OSError:
@@ -128,9 +135,3 @@ def second_validation(new_database, file_names):
             logging.error(image_name + ": this image is not stored.\n")
             new_data[4].append(image_name + ": Can not find this image")
     return new_data
-
-
-def read_file_as_b64(image_path):
-    with open(image_path, "rb") as image_file:
-        base64_bytes = base64.b64encode(image_file.read())
-    return base64_bytes.decode('utf-8')

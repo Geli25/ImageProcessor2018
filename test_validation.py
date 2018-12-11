@@ -29,12 +29,24 @@ def test_image_turn_grey(image_file, image_type):
             assert r == g == b
 
 
+@pytest.mark.parametrize("image_file", [
+    "test_resource/turn_grey/1.jpg",
+    "test_resource/turn_grey/2.jpg",
+    "test_resource/turn_grey/3.jpg",
+    ])
+def test_origin_image(image_file):
+    encoded = origin_image(image_file)
+    image_bytes = base64.b64decode(encoded)
+    encoded2 = origin_image(image_bytes)
+    assert encoded == encoded2
+
+
 @pytest.mark.parametrize("path, my_data, name, expected", [
-    ("test_resource/traverse/test1", [[], [], [], [], [], [], [], []],
+    ("test_resource/traverse/test1", [[], [], [], [], [], [], [], [], []],
      "hh", 7),
-    ("test_resource/traverse/test2", [[], [], [], [], [], [], [], []],
+    ("test_resource/traverse/test2", [[], [], [], [], [], [], [], [], []],
      "angelina", 6),
-    ("test_resource/traverse/test3", [[], [], [], [], [], [], [], []],
+    ("test_resource/traverse/test3", [[], [], [], [], [], [], [], [], []],
      "Tina", 8),
     ])
 def test_traverse_dir(path, my_data, name, expected):
