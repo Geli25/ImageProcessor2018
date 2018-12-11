@@ -73,7 +73,7 @@ class Output extends Component {
                 const rawData3 = Array(100).fill().map(Math.random);
 
 
-                const histograms = [[[rawData, rawData1, rawData2], rawData3],[[rawData1, rawData, rawData2], rawData3]]
+                const histograms = [[[rawData, rawData1, rawData2], rawData3],[[rawData1, rawData3, rawData2], rawData]]
 
                 this.props.updateImageNames(imageNames);
                 this.props.updateHistograms(histograms);
