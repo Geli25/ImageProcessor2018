@@ -46,44 +46,48 @@ class User(Base):
 
 class UploadFiles(Base):
     __tablename__ = "upload_files"
-    index = Column("file_index", Integer, primary_key=True)
+    index = Column("index", Integer, primary_key=True)
     upload_file = Column("upload_file", LargeBinary)
     upload_file_name = Column("upload_file_name", String(32))
     upload_file_type = Column("upload_file_type", String(32))
     upload_time = Column("upload_time", DateTime)
-    image_size = Column("image_size (pixel):", String)
-    user_uuid = Column("user_uuid", String, ForeignKey("users.uuid"))
+    image_size_original_row = Column("image_size_original_row", Integer)
+    image_size_original_column = Column("image_size_original_column", Integer)
+    user_uuid = Column("user_uuid", UUID, ForeignKey("users.uuid"))
     processedImage = relationship("ProcessedImage")
 
-    def __int__(self, upload_file, file_type, file_name, upload_time, uuid):
+    def __init__(self, upload_file, file_type, file_name, upload_time, uuid, index, image_size):
         self.upload_file = upload_file
         self.upload_file_type = file_type
         self.upload_file_name = file_name
-        self.image_size = str(decode_b64_image(upload_file, file_type).shape)
+        self.image_size_original_row = image_size[0]
+        self.image_size_original_column = image_size[1]
         self.upload_time = upload_time
         self.user_uuid = uuid
+        self.index = index
 
 
 class ProcessedImage(Base):
     __tablename__ = "processed_image"
     processing_type = Column("image_processing_type", String(32))
-    processing_time = Column("processing_time", DateTime)
+    processing_time = Column("processing_time", Numeric)
     processed_file = Column("processed_file", LargeBinary, primary_key=True)
     processed_file_type = Column("processed_file_type", String)
     metrics = Column("processing_metrics", Numeric)
-    image_size = Column("image_size (pixel):", Integer)
+    image_size_processed = Column("image_size_processed", String)
     num_HE = Column("number_of_histogram_equalization", Integer)
     num_CS = Column("number_of_contrast_stretching", Integer)
     num_LC = Column("number_of_log_compression", Integer)
     num_RV = Column("number_of_reverse_video", Integer)
-    uploadFiles_index = Column("upload_file_index", String, ForeignKey("upload_files.index"))
+    uploadFiles_index = Column("upload_file_index", Integer, ForeignKey("upload_files.index"))
 
-    def __int__(self, processing_type, processing_time, processed_file, processed_file_type,
-                processing_latency, num_HE, num_CS, num_LC, num_RV, index):
+    def __init__(self, processing_type, processing_time, processed_file, processed_file_type,
+                 processing_latency, num_HE, num_CS, num_LC, num_RV, index, image_size):
         self.processing_type = processing_type
+        self.processed_file_type = processed_file_type
         self.processing_time = processing_time
         self.processed_file = processed_file
-        self.image_size = str(decode_b64_image(processed_file, processed_file_type).shape)
+        self.image_size_processed = image_size
         self.metrics = processing_latency
         self.num_HE = num_HE
         self.num_CS = num_CS
@@ -111,7 +115,7 @@ class HandleNewUserRequest(object):
         self.upload_file_name = file_name
         self.upload_time = upload_time
         self.processing_type = processing_type
-        self.processing_time = []
+        self.processing_time = 0
         self.processed_file = []
         self.image_size_original = []
         self.image_size_processed = []
@@ -123,20 +127,20 @@ class HandleNewUserRequest(object):
         image_processing function process the image according
         user's request
         """
-        processed = []
         for index in self.processed_file_index:
             time_be = time()
             current_img = self.upload_file[index]
             decode_img = decode_b64_image(current_img, self.upload_file_type[index])
-            out_img, actions, size = process_image(decode_img, self.processing_type[-1], self.actions)
+            self.image_size_original.append(decode_img.shape)
+            out_img, actions, size = process_image(decode_img, self.processing_type, self.actions)
             time_af = time()
-            self.metrics = time_af - time_be
-            print(out_img.shape)
-            processed.append(encode_nparray_to_img(out_img, self.upload_file_type[index]))
+            self.metrics.append(time_af - time_be)
             self.image_size_processed.append(size)
             self.actions = actions
-        self.processed_file.append(processed)
-        self.processing_time = datetime.datetime.now() - self.upload_time[-1]
+            self.processed_file.append(encode_nparray_to_img(out_img, self.upload_file_type[index]))
+        value = datetime.datetime.now() - self.upload_time
+        self.processing_time = value.total_seconds()
+
 
     def to_ui(self):
         """
@@ -153,17 +157,20 @@ class HandleNewUserRequest(object):
             # decode_his2 = np.histogram(upload_decode, bins=254)
             # his_pair.append([decode_his2, decode_his])
             if self.upload_file_type[index] == "JPEG" or "JPG":
-                format1 = encode_nparray_to_img(decode, "PNG")
-                format2 = encode_nparray_to_img(decode, "TIFF")
-                img_pair.append([self.upload_file[index], self.processed_file[-1][index], format2, format1])
+                format1 = encode_nparray_to_img(decode, "PNG").decode('utf-8')
+                format2 = encode_nparray_to_img(decode, "TIFF").decode('utf-8')
+                img_pair.append([self.upload_file[index], self.processed_file[-1][index].decode('utf-8'),
+                                 format2, format1])
             elif self.upload_file_type[index] == "PNG":
-                format1 = encode_nparray_to_img(decode, "JPEG")
-                format2 = encode_nparray_to_img(decode, "TIFF")
-                img_pair.append([self.upload_file[index], format1, format2, self.processed_file[-1][index]])
+                format1 = encode_nparray_to_img(decode, "JPEG").decode('utf-8')
+                format2 = encode_nparray_to_img(decode, "TIFF").decode('utf-8')
+                img_pair.append([self.upload_file[index], format1, format2,
+                                 self.processed_file[-1][index].decode('utf-8')])
             else:
-                format1 = encode_nparray_to_img(decode, "PNG")
-                format2 = encode_nparray_to_img(decode, "JPEG")
-                img_pair.append([self.upload_file[index], format2, self.processed_file[-1][index]], format1)
+                format1 = encode_nparray_to_img(decode, "PNG").decode('utf-8')
+                format2 = encode_nparray_to_img(decode, "JPEG").decode('utf-8')
+                img_pair.append([self.upload_file[index], format2,
+                                 self.processed_file[-1][index].decode('utf-8')], format1)
 
         return {"uuid": self.uuid,
                 "img_pair": img_pair,
@@ -187,7 +194,7 @@ def encode_nparray_to_img(np_array, img_format):
     im2 = image.convert("L")
     ft = 'JPEG' if img_format == 'jpg' or 'JPG' else img_format
     im2.save(buffer, format=ft)
-    return base64.b64encode(buffer.getvalue()).decode('utf-8')
+    return base64.b64encode(buffer.getvalue())
 
 
 def decode_b64_image(base64_string, img_format):
@@ -219,11 +226,13 @@ def initial_new_image_processing():
     user = User(user_request.uuid)
     for index in data[3]:
         files = UploadFiles(user_request.upload_file[index], user_request.upload_file_type[index],
-                            user_request.upload_file_name[index], user_request.upload_time, user_request.uuid)
-        processed_files = ProcessedImage(user_request.processing_type, user_request.processing_time[index],
+                            user_request.upload_file_name[index], user_request.upload_time, user_request.uuid,
+                            index, user_request.image_size_original[index])
+        processed_files = ProcessedImage(user_request.processing_type, user_request.processing_time,
                                          user_request.processed_file[index], user_request.upload_file_type[index],
                                          user_request.metrics[index], user_request.actions[0], user_request.actions[1],
-                                         user_request.actions[2], user_request.actions[3], index)
+                                         user_request.actions[2], user_request.actions[3], index,
+                                         user_request.image_size_processed[index])
         files.processedImage.append(processed_files)
         user.uploadFiles.append(files)
     session.add(user)
