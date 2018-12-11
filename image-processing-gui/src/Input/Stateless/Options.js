@@ -11,7 +11,6 @@ const Options = props => {
                 id="HE"
                 onChange={()=>props.toggle("HE")} />
             <label htmlFor="HE">Histogram Equalization</label>
-
             <input
                 type="checkbox"
                 checked={props.optionData.CS}

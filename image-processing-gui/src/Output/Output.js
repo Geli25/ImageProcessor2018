@@ -111,6 +111,7 @@ class Output extends Component {
         if (this.props.sentStatus&&this.state.loading){
             content=(
                 <Fragment>
+                    <br />
                     <h4>Getting your data...</h4>
                     <p><b>Please do not navigate to another page</b></p>
                     <Loader />
@@ -127,7 +128,10 @@ class Output extends Component {
             <div>
                 {this.props.sentStatus 
                     && !this.state.loading 
-                    ? <div className="icono-reset" size="20px" onClick={this.retrieveData}></div> : null}
+                    ? <Fragment>
+                        <br />
+                        <div className="icono-reset" size="20px" onClick={this.retrieveData} />
+                      </Fragment> : null}
                 {content}
                 {this.props.sentStatus
                     &&!this.state.loading 
