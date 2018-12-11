@@ -1,0 +1,25 @@
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+
+src = Image.open('pa.png')
+r, g, b = src.split()
+print(type(r))
+ar = np.array(r).flatten()
+file = open('data.txt', 'w')
+file.write(str(list(ar)))
+file.close()
+bins = range(0, 256)
+plt.hist(ar, bins=bins, density=1, color='r')
+ag = np.array(g).flatten()
+plt.hist(ag, bins=bins, density=1, color='g')
+ab = np.array(b).flatten()
+plt.hist(ab, bins=bins, density=1, color='b')
+plt.show()
+img = np.array(src.convert('L'))
+plt.figure("lena")
+arr = img.flatten()
+n, bins, patches = plt.hist(arr, bins=bins, density=1, color='grey', alpha=0.75)
+print(bins)
+print(patches[0])
+plt.show()
