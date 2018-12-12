@@ -77,7 +77,7 @@ def test_validate(database, expected):
     assert expected == len(response[0])
 
 
-@pytest.mark.parametrize("new_database, file_names, expected", [
+@pytest.mark.parametrize("new_database, expected", [
     ({"CS": True,
       "HE": False,
       "LC": False,
@@ -85,24 +85,21 @@ def test_validate(database, expected):
       "uuid": 1,
       "selectedFilename": ["1.jpg", "hh.zip/2.jpg"]
       },
-     ["1.jpg", "2.jpg", "3.jpg", "tina.zip/4.jpg", "hh.zip/2.jpg",
-      "angelina.zip/7.jpg"],
-     [0, 4]
+     [2, 1]
      ),
     ({"CS": True,
-      "HE": False,
+      "HE": True,
       "LC": False,
       "RV": False,
       "uuid": 1,
       "selectedFilename": ["2.jpg", "angelina.zip/7.jpg"]
       },
-     ["1.jpg", "2.jpg", "3.jpg", "tina.zip/4.jpg", "hh.zip/2.jpg",
-      "angelina.zip/7.jpg"],
-     [1, 5])
+     [2, 2])
 ])
-def test_second_validation(new_database, file_names, expected):
-    response = second_validation(new_database, file_names)
-    assert response[0] == expected
+def test_second_validation(new_database, expected):
+    response = second_validation(new_database)
+    assert len(response[0]) == expected[0]
+    assert len(response[1]) == expected[1]
 
 
 @pytest.mark.parametrize("access, file_name, expected", [

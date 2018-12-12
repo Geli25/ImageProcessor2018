@@ -133,9 +133,9 @@ def validate(database):
     return data
 
 
-def second_validation(new_database, file_names):
+def second_validation(new_database):
     update_time = dt.datetime.now()
-    new_data = [[], [], update_time, new_database["uuid"], []]
+    new_data = [[], [], update_time, new_database["uuid"]]
     if new_database["CS"]:
         new_data[1].append("CS")
     if new_database["HE"]:
@@ -145,9 +145,5 @@ def second_validation(new_database, file_names):
     if new_database["RV"]:
         new_data[1].append("RV")
     for image_name in new_database["selectedFilename"]:
-        try:
-            new_data[0].append(file_names.index(image_name))
-        except ValueError:
-            logging.error(image_name + ": this image is not stored.\n")
-            new_data[4].append(image_name + ": Can not find this image")
+        new_data[0].append(image_name)
     return new_data
