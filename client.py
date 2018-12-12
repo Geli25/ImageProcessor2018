@@ -61,9 +61,9 @@ r1 = requests.post("http://127.0.0.1:5000/new_user_request", json=p1)
 print(r1.text)
 """
 """
-uuid1 = '18a7f762-fce7-4cf8-8a94-11924afbbdcd'
-img_name = ["ISIC_0000000.jpg", "ISIC_0000001.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
-            "ISIC_0000005.jpg", "ISIC_0000006.jpg", "ISIC_0000007.jpg", "ISIC_0000008.jpg", "ISIC_0000009.jpg"]
+uuid1 = '074becde-4ae9-418f-b552-a30cf983b8e5'
+img_name = ["ISIC_0000000.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
+            "ISIC_0000005.jpg"]
 p1 = {
     "HE": False,
     "CS": True,
@@ -77,7 +77,7 @@ print(r1.text)
 
 """
 
-uuid1 = '18a7f762-fce7-4cf8-8a94-11924afbbdcd'
+uuid1 = '074becde-4ae9-418f-b552-a30cf983b8e5'
 r2 = requests.get("http://127.0.0.1:5000/get_processed_result{0}".format(uuid1))
 print(r2.text)
 img = r2.json()['img_pair']
