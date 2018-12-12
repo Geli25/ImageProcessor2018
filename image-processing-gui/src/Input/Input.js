@@ -21,13 +21,19 @@ class Input extends Component {
             "CS":false,
             "LC":false,
             "RV":false,
-            "uuid":this.props.uuid,
+            "uuid":null,
             "fileNames": [],
         }
     }
 
+    shouldComponentUpdate(nextProps, nextState){
+        return nextProps!==this.props||nextState!==this.state;
+    }
+
     componentWillMount(){
         this.props.setReset();
+        this.setState({uuid:this.props.uuid});
+        console.log("setting state");
     }
     
     optionToggle=(option)=>{
@@ -104,6 +110,7 @@ class Input extends Component {
         else{
             this.setState({ loading: true }, () => {
                 console.log(this.state);
+                console.log(this.props.uuid);
             })
             this.props.setLoading(true);
             this.props.sent();

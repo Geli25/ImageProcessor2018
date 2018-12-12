@@ -14,7 +14,7 @@ const ProcessedImages=props=>{
             let fileName = name.substr(0,name.indexOf('.'));
             let size = props.imageSizes[index];
             let histogram=props.histograms[index];
-            let formats=[".jpeg",".png",".tiff"]
+            let formats=[".jpeg",".png",".tiff"];
 
             for (let type of pair[1]){
                 let typeIndex=pair[1].indexOf(type);

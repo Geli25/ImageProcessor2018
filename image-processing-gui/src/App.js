@@ -17,6 +17,10 @@ class App extends Component {
         uuid: null,
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps !== this.props || nextState !== this.state;
+    }
+
     resetApp=()=>{
         const uuidv4 = require('uuid/v4');
         let newUuid = uuidv4();
