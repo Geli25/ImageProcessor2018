@@ -33,9 +33,11 @@ def process_image(image, list_processing_method, actions):
             actions[1] += 1
         elif n is "LC":
             output = exposure.adjust_log(output)
+            output = exposure.rescale_intensity(output, out_range=(0, 255))
             actions[2] += 1
         elif n is "RV":
             output = util.invert(output)
+            output = exposure.rescale_intensity(output, out_range=(0, 255))
             actions[3] += 1
     size = image.shape
 
@@ -47,12 +49,12 @@ if __name__ == "__main__":
     image = imread('test.jpg')
     print('image:', image.shape)
     image = image[:, :, 0]
-    list_processing_method = ['CS']
+    list_processing_method = ['HE', 'LC']
     actions = [0, 0, 0, 0]
     output, actions, size = process_image(image, list_processing_method, actions)
     plt.subplot(1, 2, 1)
     plt.imshow(image, interpolation='nearest', cmap='gray')
     plt.subplot(1, 2, 2)
-    plt.imshow(output, interpolation='nearest', cmap='gray')
+    plt.imshow(output, cmap='gray')
     plt.show()
     print('actions:', actions, 'size', size)
