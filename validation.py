@@ -56,8 +56,8 @@ def traverse_dir(path, my_data, name):
                 if file_type in all_type:
                     my_data[0].append(image_turn_grey(in_file, file_type))
                     my_data[8].append(origin_image(in_file))
-                    my_data[1].append(file_type)
-                    my_data[2].append(add_name(my_data, name + "/" + file, 0))
+                    my_data[1].append(file_type.lower())
+                    add_name(my_data, name + "/" + file, 0)
                 else:
                     logging.warning(in_file +
                                     " does not have an image type\n")
@@ -120,7 +120,7 @@ def validate(database):
                 data[0].append(image_turn_grey(image_bytes, data_type))
                 data[8].append(origin_image(image_bytes))
                 data[1].append(data_type)
-                data[2].append(add_name(data, file_name, 0))
+                add_name(data, file_name, 0)
             except OSError:
                 logging.error(file_name + " the uploaded file is broken\n")
                 data[7].append(file_name + " the uploaded file is broken")
