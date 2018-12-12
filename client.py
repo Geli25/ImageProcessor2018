@@ -5,6 +5,7 @@ import base64
 import io
 import matplotlib.image as matimage
 
+
 def decode_b64_image(base64_string, img_format):
     """
     decode_b64_image decode bytes string into a np array of
@@ -20,7 +21,28 @@ def decode_b64_image(base64_string, img_format):
     return decoded_img
 
 """
-
+img_name = ["ISIC_0000000.jpg", "ISIC_0000001.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
+            "ISIC_0000005.jpg", "ISIC_0000006.jpg", "ISIC_0000007.jpg", "ISIC_0000008.jpg", "ISIC_0000009.jpg"]
+files = []
+for i in img_name:
+    with open(i, "rb") as image_file:
+        encode = base64.b64encode(image_file.read()).decode('utf-8')
+    files.append(encode)
+uuid1 = str(uuid.uuid4())
+p1 = {
+    "files": files,
+    "HE": True,
+    "CS": False,
+    "LC": True,
+    "RV": False,
+    "uuid": uuid1,
+    "fileNames": img_name
+}
+print(uuid1)
+r1 = requests.post("http://127.0.0.1:5000/new_user_request", json=p1)
+print(r1.text)
+"""
+"""
 with open("test.jpg", "rb") as image_file:
     encode = base64.b64encode(image_file.read())
 data = encode.decode('utf-8')
@@ -38,7 +60,24 @@ print(uuid1)
 r1 = requests.post("http://127.0.0.1:5000/new_user_request", json=p1)
 print(r1.text)
 """
-uuid1 = 'f6812d6e-8a90-4f11-91fb-e462d658f1d7'
+"""
+uuid1 = '18a7f762-fce7-4cf8-8a94-11924afbbdcd'
+img_name = ["ISIC_0000000.jpg", "ISIC_0000001.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
+            "ISIC_0000005.jpg", "ISIC_0000006.jpg", "ISIC_0000007.jpg", "ISIC_0000008.jpg", "ISIC_0000009.jpg"]
+p1 = {
+    "HE": False,
+    "CS": True,
+    "LC": True,
+    "RV": True,
+    "uuid": uuid1,
+    "selectedFilename": img_name
+}
+r1 = requests.post("http://127.0.0.1:5000/update_user_request", json= p1)
+print(r1.text)
+
+"""
+
+uuid1 = '18a7f762-fce7-4cf8-8a94-11924afbbdcd'
 r2 = requests.get("http://127.0.0.1:5000/get_processed_result{0}".format(uuid1))
 print(r2.text)
 img = r2.json()['img_pair']
@@ -56,5 +95,7 @@ def img_compare(img1, img2, img3, img4):
     plt.show()
 
 
-img_compare(img[0][0],img[0][1],img[0][2],img[0][3])
+for number in img:
+    img_compare(number[0], number[1], number[2], number[3])
 
+""""""
