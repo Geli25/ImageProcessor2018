@@ -8,7 +8,14 @@ import * as actionCreator from '../store/actions/returnedData';
 import './icono.min.css';
 import Loader from '../UI/Loader';
 import {Badge} from 'reactstrap';
-import Results from './Stateful/Results';
+import Results from './Stateless/Results';
+
+import FileSaver from 'file-saver';
+import JSZip from 'jszip';
+
+let zipJ = new JSZip();
+let zipP = new JSZip();
+let zipT = new JSZip();
 
 class Output extends Component {
     state={
@@ -103,6 +110,50 @@ class Output extends Component {
         //     })
     }
 
+
+    //methods used by child components
+
+    downloadClick = (img64, name) => {
+        FileSaver.saveAs(img64, name);
+    }
+
+    zipFiles = (img64, name, type) => {
+        if (type === "jpeg") {
+            zipJ.file("processed_" + name, img64, { base64: true });
+        }
+        if (type === "png") {
+            zipP.file("processed_" + name, img64, { base64: true })
+        }
+        if (type === "tiff") {
+            zipT.file("processed_" + name, img64, { base64: true })
+        }
+    }
+
+    downloadAll = (type) => {
+        if (type === "jpeg") {
+            zipJ.generateAsync({ type: "blob" }).then(
+                (content) => {
+                    FileSaver.saveAs(content, "processed_files_jpg.zip");
+                }
+            );
+        }
+        if (type === "png") {
+            zipP.generateAsync({ type: "blob" }).then(
+                (content) => {
+                    FileSaver.saveAs(content, "processed_files_png.zip");
+                }
+            );
+        }
+        if (type === "tiff") {
+            zipT.generateAsync({ type: "blob" }).then(
+                (content) => {
+                    FileSaver.saveAs(content, "processed_files_png.zip");
+                }
+            );
+        }
+    }
+
+
     render() {
         let content = (
             <Fragment>
@@ -140,7 +191,11 @@ class Output extends Component {
                     ? <Fragment>
                         <br />
                         <Badge className="refresh" color="dark" href="" onClick={this.retrieveData}>Click icon to refresh results</Badge>
-                        <Results />
+                        <Results
+                            zipFiles={this.zipFiles}
+                            downloadAll={this.downloadAll}
+                            downloadClick={this.downloadClick}
+                         />
                       </Fragment> 
                     : null}
             </div>
@@ -165,7 +220,7 @@ const mapDispatchtoProps=dispatch=>{
         updateImageSizes: (sizes) => dispatch(actionCreator.updateImageSizes(sizes)),
         updateProcessingTime:(time)=>dispatch(actionCreator.updateProcessingTime(time)),
         updateImageNames:(names)=>dispatch(actionCreator.updateImageNames(names)),
-        updateHistograms:(histograms)=>dispatch(actionCreator.updateHistograms(histograms))
+        updateHistograms:(histograms)=>dispatch(actionCreator.updateHistograms(histograms)),
     }
 }
 
