@@ -46,10 +46,10 @@ def process_image(image, list_processing_method, actions):
 
 
 if __name__ == "__main__":
-    image = imread('test.jpg')
+    image = imread('ISIC_0000009.jpg')
     print('image:', image.shape)
     image = image[:, :, 0]
-    list_processing_method = ['HE', 'LC']
+    list_processing_method = ['CS', 'LC', 'RV']
     actions = [0, 0, 0, 0]
     output, actions, size = process_image(image, list_processing_method, actions)
     plt.subplot(1, 2, 1)
