@@ -18,6 +18,8 @@ GRANT ALL PRIVILEGES ON DATABASE bme590finalproject TO hw188;
 
 DROP DATABASE bme590finalproject;
 
+virtualenv -p python3 env
+
 
 https://www.pythoncentral.io/understanding-python-sqlalchemy-session/
 https://suhas.org/sqlalchemy-tutorial/
