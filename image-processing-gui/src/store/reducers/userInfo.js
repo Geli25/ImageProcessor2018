@@ -7,6 +7,7 @@ const initialState={
     redirectActive:false,
     sent:false,
     gotData:false,
+    histoDisplay:false,
     resetRedirect:false,
     fileNames:[]
 }
@@ -21,7 +22,8 @@ const reducer=(curState=initialState,action)=>{
                 sent:false,
                 fileNames:[],
                 resetRedirect:true,
-                gotData:false
+                gotData:false,
+                histoDisplay:false
             })
         case actionTypes.SET_LOADING:
             return stateUpdater(curState,{
@@ -48,6 +50,11 @@ const reducer=(curState=initialState,action)=>{
         case actionTypes.GOT_DATA:{
             return stateUpdater(curState,{
                 gotData:action.gotData
+            })
+        }
+        case actionTypes.TOGGLE_HISTO_DISPLAY:{
+            return stateUpdater(curState,{
+                histoDisplay:!curState.histoDisplay
             })
         }
         default:

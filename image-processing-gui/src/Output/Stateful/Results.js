@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import {connect} from 'react-redux';
+import {toggleHistoDisplay} from '../../store/actions/userInfo';
 import ProcessedImages from '../Stateless/ProcessedImages';
 import DownloadAllButton from './DownloadAllButton';
 
@@ -11,16 +12,8 @@ let zipP = new JSZip();
 let zipT = new JSZip();
 
 class Results extends Component{
-    state={
-        histogram:false
-    }
-
     toggleHisto=()=>{
-        this.setState(prevState=>(
-            {
-                histogram:!prevState.histogram
-            }
-        ))
+        this.props.toggleDisplay();
     }
 
     downloadClick = (img64, name) => {
@@ -71,11 +64,10 @@ class Results extends Component{
                 <DownloadAllButton dlall={this.downloadAll} />
                 <br />
                 <h5>Your processed images are shown below:</h5>
-                <input id="histogram" type="checkbox" onChange={this.toggleHisto} checked={this.state.histogram} />
+                <input id="histogram" type="checkbox" onChange={this.toggleHisto} checked={this.props.histoDisplay} />
                 <label htmlFor="histogram">Show color analysis histogram</label>
                 <ProcessedImages 
                     zip={this.zipFiles}
-                    histogram={this.state.histogram} 
                     download={this.downloadClick} />
             </Fragment >
         )
@@ -84,8 +76,15 @@ class Results extends Component{
 
 const mapStatetoProps=reduxState=>{
     return{
-        processingTime: reduxState.returnedData.processingTime
+        processingTime: reduxState.returnedData.processingTime,
+        histoDisplay:reduxState.userInfo.histoDisplay
     }
 }
 
-export default connect(mapStatetoProps)(Results);
+const mapDispatchtoProps=dispatch=>{
+    return{
+        toggleDisplay:()=>dispatch(toggleHistoDisplay()),
+    }
+}
+
+export default connect(mapStatetoProps,mapDispatchtoProps)(Results);

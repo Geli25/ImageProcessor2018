@@ -36,7 +36,7 @@ const ProcessedImages=props=>{
                     <ImagePairs pair={pair} size={size} />
 
                     {/* Histograms */}
-                    {props.histogram ? <HistogramGroup histogram={histogram} /> : null}
+                    {props.histoDisplay ? <HistogramGroup histogram={histogram} /> : null}
 
                     {/* Download Button */}
                     <EachDropDownButton pair={pair} name={name} download={props.download} />
@@ -52,7 +52,8 @@ const mapStatetoProps = reduxState => {
         imagePairs: reduxState.returnedData.imagePairs,
         imageSizes: reduxState.returnedData.imageSizes,
         imageNames: reduxState.returnedData.imageNames,
-        histograms: reduxState.returnedData.histograms
+        histograms: reduxState.returnedData.histograms,
+        histoDisplay:reduxState.userInfo.histoDisplay
     }
 }
 

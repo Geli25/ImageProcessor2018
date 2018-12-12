@@ -46,3 +46,9 @@ export const gotData=(bool)=>{
         gotData:bool
     }
 }
+
+export const toggleHistoDisplay=()=>{
+    return{
+        type:actionTypes.TOGGLE_HISTO_DISPLAY
+    }
+}

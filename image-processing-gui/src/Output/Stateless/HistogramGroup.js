@@ -1,5 +1,4 @@
-import React, {Fragment} from 'react';
-import { BarSeries, XAxis, YAxis } from '@data-ui/histogram';
+import React from 'react';
 
 import ColoredHistoPair from './ColoredHistoPair';
 import MonochromeHistoPair from './MonochromeHistoPair'
