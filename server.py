@@ -200,7 +200,6 @@ def to_ui(uuid, processed_file, upload_file_type, upload_file_name, upload_file,
     img_size_pair = []
 
     for index, files in enumerate(upload_file):
-
         decode = decode_b64_image(processed_file[index], upload_file_type[index])
         # decode_his = np.histogram(decode, bins=254)
         # upload_decode = decode_b64_image(self.upload_file[index], self.file_type[index])
@@ -240,7 +239,9 @@ def initial_new_image_processing():
     """
     r = request.get_json()
     data = validate(r)
-    user_request = HandleNewUserRequest(data[6], data[0], data[4], data[5], data[1], data[3], data[2])
+    print("data[2]",data[2])
+    print("r",r["fileNames"])
+    user_request = HandleNewUserRequest(data[6], data[0], data[4], data[5], data[1], data[3], r["fileNames"])
     user_request.image_processing()
     session = Session()
     user = User(user_request.uuid)
@@ -252,6 +253,7 @@ def initial_new_image_processing():
         files = UploadFiles(user_request.upload_file[index], user_request.upload_file_type[index],
                             user_request.upload_file_name[index], user_request.upload_time, user_request.uuid,
                             index, user_request.image_size_original[index], True)
+        print("user_request.upload_file_name[index]",user_request.upload_file_name[index])
         processed_file_name = user_request.upload_file_name[index] + '_' + str(index)
         processed_files = ProcessedImage(user_request.processing_type, user_request.processing_time,
                                          user_request.processed_file[index], user_request.upload_file_type[index],
@@ -278,69 +280,57 @@ def add_new_processing_to_exist_user():
     r = request.get_json()
     session = Session()
     data = second_validation(r)
-    query = session.query(User, UploadFiles, ProcessedImage).filter(User.uuid == UploadFiles.user_uuid) \
-        .filter(UploadFiles.upload_file_name == ProcessedImage.uploadFiles_upload_file_name) \
-        .filter(User.uuid == data[3]).all()
-    print(query[0].ProcessedImage)
-    if isinstance(query[0].ProcessedImage, ProcessedImage):
-        new_processed_number = 1
+    query_processedimage = session.query(ProcessedImage).filter(ProcessedImage.user_uuid_processed == data[3]).all()
+    query_uploadfiles = session.query(UploadFiles).filter(UploadFiles.user_uuid == data[3]).all()
+    if isinstance(query_processedimage, ProcessedImage):
+        # single processed image
+        new_processed_number = query_processedimage.processed_number
+        pre_actions_HE = query_processedimage.num_HE
+        pre_actions_CS = query_processedimage.num_CS
+        pre_actions_RV = query_processedimage.num_RV
+        pre_actions_LC = query_processedimage.num_LC
     else:
-        new_processed_number = max(query[0].ProcessedImage.processed_number)+1
-
+        total = []
+        total_he = []
+        total_cs = []
+        total_rv = []
+        total_lc = []
+        for row in query_processedimage:
+            total.append(row.processed_number)
+            total_he.append(row.num_HE)
+            total_cs.append(row.num_CS)
+            total_rv.append(row.num_RV)
+            total_lc.append(row.num_LC)
+            last_prcessed_file_name = row.processed_file_name
+        new_processed_number = max(total)
+        pre_actions_HE = max(total_he)
+        pre_actions_CS = max(total_cs)
+        pre_actions_RV = max(total_rv)
+        pre_actions_LC = max(total_lc)
     processing_index = []
+    old_upload_file = []
+    old_upload_file_type = []
+    old_upload_file_name = data[0]
     for index, i in enumerate(data[0]):
         processing_index.append(index)
+        for row in query_uploadfiles:
+            if row.upload_file_name == i:
+                old_upload_file.append(row.upload_file)
+                old_upload_file_type.append(row.upload_file_type)
+            else:
+                row.require_processing = False
     print("processing_index", processing_index)
-    if isinstance(query[0].UploadFiles, UploadFiles):
-        print("yes")
-        update_ur = HandleNewUserRequest(data[3], [query[0].UploadFiles.upload_file],
-                                         data[1], data[2],
-                                         [query[0].UploadFiles.upload_file_type],
-                                         processing_index, [query[0].UploadFiles.upload_file_name])
-        update_ur.image_processing()
-        print("query[0].UploadFiles.upload_file", len(query[0].ProcessedImage.processed_file))
-
-    else:
-        print("notttt")
-        file_name = []
-        file = []
-        file_ty = []
-        for row in query[0].UploadFiles:
-            if row.upload_file_name in data[0]:
-                file_name.append(row.upload_file_name)
-                file.append(row.upload_file)
-                file_ty.append(row.upload_file_type)
-        update_ur = HandleNewUserRequest(data[3], file, data[1], data[2], file_ty, processing_index, file_name)
-        update_ur.image_processing()
-    print("new_processed_number", new_processed_number)
-
-    if isinstance(query[0].ProcessedImage.num_HE, int):
-        pre_actions_HE = query[0].ProcessedImage.num_HE
-        pre_actions_CS = query[0].ProcessedImage.num_CS
-        pre_actions_RV = query[0].ProcessedImage.num_RV
-        pre_actions_LC = query[0].ProcessedImage.num_LC
-        last_prcessed_file_name = query[0].ProcessedImage.processed_file_name
-    else:
-        pre_actions_HE = max(query[0].ProcessedImage.num_HE)
-        pre_actions_CS = max(query[0].ProcessedImage.num_CS)
-        pre_actions_RV = max(query[0].ProcessedImage.num_RV)
-        pre_actions_LC = max(query[0].ProcessedImage.num_LC)
-        last_prcessed_file_name = query[0].ProcessedImage.processed_file_name[-1]
-    query[0].UploadFiles.require_processing = False
+    update_ur = HandleNewUserRequest(data[3], old_upload_file, data[1], data[2], old_upload_file_type,
+                                     processing_index, old_upload_file_name)
+    update_ur.image_processing()
+    # for number of file need to be processed
     for index, fn in enumerate(data[0]):
         print("index", index)
-        print("len(update_ur.processed_file)",len(update_ur.processed_file[index]))
+        print("len(update_ur.processed_file)",len(update_ur.processed_file))
         print("len(update_ur.upload_file_type)",len(update_ur.upload_file_type))
         print("len(update_ur.upload_file_name)",len(update_ur.upload_file_name))
-        print("len(query[0].ProcessedImage.processed_files_name)",len(query[0].ProcessedImage.processed_file_name))
         print("update_ur.actions[0]+pre_actions_HE", update_ur.actions[0]+pre_actions_HE)
-        if isinstance(query[0].UploadFiles, UploadFiles):
-            query[0].UploadFiles.require_processing = True
-        else:
-            for row in query[0].UploadFiles:
-                if row.upload_file_name == fn:
-                    row.require_processing = True
-        processed_files_name = last_prcessed_file_name[:-1] + str(int(last_prcessed_file_name[-1])+index+3)
+        processed_files_name = last_prcessed_file_name[:-1]+str(int(last_prcessed_file_name[-1])+index+1)
         processed_files = ProcessedImage(update_ur.processing_type, update_ur.processing_time,
                                          update_ur.processed_file[index], update_ur.upload_file_type[index],
                                          update_ur.metrics[index], update_ur.actions[0]+pre_actions_HE,
@@ -367,7 +357,7 @@ def get_processed_result(uuid):
     info_processedimage  = session.query(ProcessedImage).filter(ProcessedImage.user_uuid_processed == uuid).all()
     print("info_uploadfiles", info_uploadfiles)
     print("info_processedimage", info_processedimage)
-    if isinstance(info_processedimage , ProcessedImage):
+    if isinstance(info_processedimage, ProcessedImage):
         processed_img_index = info_processedimage.processed_number
         print("info_processedimage.processed_number", query[0].ProcessedImage)
     else:
@@ -375,7 +365,8 @@ def get_processed_result(uuid):
         for row in info_processedimage:
             pro_num.append(row.processed_number)
         processed_img_index = max(pro_num)
-    q = session.query(ProcessedImage).filter(ProcessedImage.processed_number == processed_img_index).all()
+    q = session.query(ProcessedImage).filter(ProcessedImage.user_uuid_processed == uuid and
+                                             ProcessedImage.processed_number == processed_img_index).all()
     print("q",len(q))
     out_processed_file = []
     out_processed_image_size = []
@@ -399,15 +390,15 @@ def get_processed_result(uuid):
             out_original_image_size.append([row.image_size_original_row, row.image_size_original_column])
 
     print("processed_img_index", processed_img_index)
-    if isinstance(info_uploadfiles[0], UploadFiles):
-        output = to_ui(uuid, out_processed_file, [info_uploadfiles[0].upload_file_type],
-                       info_uploadfiles[0].upload_file_name, [info_uploadfiles[0].upload_file], out_original_image_size,
-                       out_processed_image_size, out_processed_time)
-    else:
-        for row in info_uploadfiles:
-            output = to_ui(uuid, out_processed_file, row.upload_file_type,
-                            row.upload_file_name, row.upload_file, out_original_image_size,
-                            out_processed_image_size, out_processed_time)
+    upload_file_type = []
+    upload_file_name = []
+    upload_file = []
+    for o in info_uploadfiles:
+        upload_file_type.append(o.upload_file_type)
+        upload_file_name.append(o.upload_file_name)
+        upload_file.append(o.upload_file)
+    output = to_ui(uuid, out_processed_file, upload_file_type, upload_file_name, upload_file,
+                   out_original_image_size, out_processed_image_size, out_processed_time)
     session.close()
     return jsonify(output)
 
