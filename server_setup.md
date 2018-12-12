@@ -16,8 +16,7 @@ CREATE DATABASE bme590finalproject;
 CREATE USER hw188 WITH PASSWORD '123456';
 GRANT ALL PRIVILEGES ON DATABASE bme590finalproject TO hw188;
 
-update session user request 
-add the last features for the image processing file 
+DROP DATABASE bme590finalproject;
 
 
 https://www.pythoncentral.io/understanding-python-sqlalchemy-session/
