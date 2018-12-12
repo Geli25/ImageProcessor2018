@@ -19,12 +19,11 @@ def decode_b64_image(base64_string, img_format):
     decoded_img = matimage.imread(image_buffer, format=ft)
     return decoded_img
 
+"""
+
 with open("test.jpg", "rb") as image_file:
     encode = base64.b64encode(image_file.read())
 data = encode.decode('utf-8')
-print("encode:", encode)
-print("data:", data)
-print("decode:", decode_b64_image(data, 'jpg'))
 uuid1 = str(uuid.uuid4())
 p1 = {
     "files": [data],
@@ -38,19 +37,24 @@ p1 = {
 print(uuid1)
 r1 = requests.post("http://127.0.0.1:5000/new_user_request", json=p1)
 print(r1.text)
-#r2 = requests.get("http://127.0.0.1:5000/get_processed_result{0}".format(uuid1))
+"""
+uuid1 = 'f6812d6e-8a90-4f11-91fb-e462d658f1d7'
+r2 = requests.get("http://127.0.0.1:5000/get_processed_result{0}".format(uuid1))
+print(r2.text)
+img = r2.json()['img_pair']
 
 
-def img_compare(img_be, img_af):
-    plt.subplot(1, 2, 1)
-    plt.imshow(decode_b64_image(img_be, 'jpeg'), interpolation='nearest', cmap='gray')
-    plt.subplot(1, 2, 2)
-    plt.imshow(decode_b64_image(img_af, 'jpeg'), cmap='gray')
+def img_compare(img1, img2, img3, img4):
+    plt.subplot(2, 2, 1)
+    plt.imshow(decode_b64_image(img1, 'jpeg'), interpolation='nearest', cmap='gray')
+    plt.subplot(2, 2, 2)
+    plt.imshow(decode_b64_image(img2, 'jpeg'), cmap='gray')
+    plt.subplot(2, 2, 3)
+    plt.imshow(decode_b64_image(img3, 'jpeg'), cmap='gray')
+    plt.subplot(2, 2, 4)
+    plt.imshow(decode_b64_image(img4, 'jpeg'), cmap='gray')
     plt.show()
 
 
+img_compare(img[0][0],img[0][1],img[0][2],img[0][3])
 
-for img_pair in r2['img_pair']:
-    img_be = img_pair[0]
-    img_af = img_pair[1]
-    img_compare(img_be, img_af)
