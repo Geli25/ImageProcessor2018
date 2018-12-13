@@ -12,7 +12,6 @@ import matplotlib.image as matimage
 from PIL import Image
 from io import BytesIO
 from validation import validate, second_validation
-import numpy as np
 from flask_cors import CORS
 from histogram import get_histogram
 """
@@ -32,11 +31,13 @@ Base = declarative_base()
 
 class User(Base):
     """
-    UserRequest class initiate an user request instance to
+    User class initiate an user request instance to
     store data:
         uuid, file, file type, file name, processing type,
         processing time, upload time, image size, actions,
         metrics
+    User is linked with UploadFiles and ProcessedImage class.
+    Primary key is uuid.
     """
     __tablename__ = "users"
     uuid = Column(UUID, primary_key=True)
@@ -48,6 +49,17 @@ class User(Base):
 
 
 class UploadFiles(Base):
+    """
+    UploadFiles class initiate a upload_files instance to database table upload_files
+    This class requires user to input:
+        index, upload_file, upload_file_name, upload_file_type, upload_time, image_size_original_row,
+        image_size_original_column, user_uuid, required_processing, file_identifier, original_color_image,
+
+    UploadFiles class is linked with User and ProcessedImage class.
+    Primary key is file_identifier, combination of uuid, file_name, and automatic generated index number.
+    This table also has a ForeignKey to reference back to user.uuid.
+
+    """
     __tablename__ = "upload_files"
     index = Column("index", Integer)
     upload_file = Column("upload_file", LargeBinary)
@@ -79,6 +91,16 @@ class UploadFiles(Base):
 
 
 class ProcessedImage(Base):
+    """
+    ProcessedImage class initiate a processed_image instance to store all processed images and their
+    metrics including:
+        processing_type, processing_time, processed_file, processed_file_type, processed_number,
+        metrics, image_size_prcoessed_row, image_size_processed_column, num_HE, num_CS, num_LC, num_RV,
+        processed_file_name, uploadFiles_upload_file_name, upload_files_identifier, user_uuid_processed
+    Primary key of this table is processed_file_name, which is auto-generated base on previous processed_name
+    and corresponding upload_file_name
+    There are two ForeignKey of this table, users_uuid and upload_file_identifier
+    """
     __tablename__ = "processed_image"
     processing_type = Column("image_processing_type", String)
     processing_time = Column("processing_time", Numeric)
@@ -241,6 +263,10 @@ def to_ui(uuid, processed_file, upload_file_type, upload_file_name, upload_file,
 
 
 class ValidationError(Exception):
+    """
+    ValidationError class generate validation error messages
+    to output
+    """
     def __int__(self, message):
         self.message = message
 
@@ -302,6 +328,11 @@ def initial_new_image_processing():
 
 @app.route("/update_user_request", methods=['POST'])
 def add_new_processing_to_exist_user():
+    """
+    add_new_processing_to_exit_user, update the user request on previous upload
+    when user has the same uuid
+    :return: message of successful update or error massage
+    """
     r = request.get_json()
     session = Session()
     data = second_validation(r)
@@ -393,6 +424,11 @@ def add_new_processing_to_exist_user():
 
 @app.route("/get_processed_result/<uuid>", methods=['GET'])
 def get_processed_result(uuid):
+    """
+    get_processed_result gets the processed result from the bme590finalproject database
+    :param uuid: user uuid
+    :return: lastest processed image information or error message
+    """
     session = Session()
     info_uploadfiles = session.query(UploadFiles)\
         .filter(UploadFiles.user_uuid == uuid).all()
