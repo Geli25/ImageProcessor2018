@@ -109,6 +109,8 @@ def test_second_validation(new_database, expected):
      "angelina", "angelina"),
     ([[], [], ["hh", "kk", "jj", "kk(1)"], [], [], [], [], [], []],
      "kk", "kk(2)"),
+    ([[], [], ["hh", "kk", "jj", "kk(1)"], [], [], [], [], [], []],
+     "kk.zip/hh.zip/j.jpg", "kk/hh/j.jpg"),
     ])
 def test_add_name(access, file_name, expected):
     add_name(access, file_name, 0)
