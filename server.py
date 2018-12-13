@@ -14,6 +14,7 @@ from io import BytesIO
 from validation import validate, second_validation
 import numpy as np
 from flask_cors import CORS
+from histogram import get_histogram
 """
 File name: server.py 
 Main: this is the server.py file to build the entire image 
@@ -209,10 +210,8 @@ def to_ui(uuid, processed_file, upload_file_type, upload_file_name, upload_file,
 
     for index, files in enumerate(upload_file):
         decode = decode_b64_image(processed_file[index], upload_file_type[index])
-        # decode_his = np.histogram(decode, bins=254)
-        # upload_decode = decode_b64_image(self.upload_file[index], self.file_type[index])
-        # decode_his2 = np.histogram(upload_decode, bins=254)
-        # his_pair.append([decode_his2, decode_his])
+        decode_his = get_histogram(original_file[index], processed_file[index])
+        his_pair.append(decode_his)
         if upload_file_type[index] == "JPEG" or "JPG":
             format1 = encode_nparray_to_img(decode, "PNG").decode('utf-8')
             format2 = encode_nparray_to_img(decode, "TIFF").decode('utf-8')
@@ -444,7 +443,7 @@ def get_processed_result(uuid):
     print("len(upload_file_original)", len(upload_file_original))
     print("len(out_processed_file)", len(out_processed_file))
     output = to_ui(uuid, out_processed_file, upload_file_type, upload_file_name, upload_file,
-                   out_original_image_size, out_processed_image_size, out_processed_time,
+                   out_original_image_size, out_processed_image_size, out_processed_time[0],
                    upload_file_original, upload_time)
     session.close()
     return jsonify(output)
