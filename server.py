@@ -21,7 +21,6 @@ processing project.
 Date: Dec 9th 2018 
 """
 
-
 app = Flask(__name__)
 engine = create_engine("postgresql://hw188:{0}@localhost:5432/bme590finalproject".format('123456'), max_overflow=20,
                        client_encoding='utf8')
@@ -51,17 +50,20 @@ class UploadFiles(Base):
     __tablename__ = "upload_files"
     index = Column("index", Integer)
     upload_file = Column("upload_file", LargeBinary)
-    upload_file_name = Column("upload_file_name", String, primary_key=True)
+    upload_file_name = Column("upload_file_name", String)
     upload_file_type = Column("upload_file_type", String)
     upload_time = Column("upload_time", DateTime)
     image_size_original_row = Column("image_size_original_row", Integer)
     image_size_original_column = Column("image_size_original_column", Integer)
     user_uuid = Column("user_uuid", UUID, ForeignKey("users.uuid"))
     require_processing = Column("require_processing", Boolean)
+    file_identifier = Column("file_identifier", String, primary_key=True)
+    original_color_image = Column("original_color_image", LargeBinary, index=False)
     processedImage = relationship("ProcessedImage", back_populates="uploadfiles")
     user = relationship("User", back_populates="uploadFiles")
 
-    def __init__(self, upload_file, file_type, file_name, upload_time, uuid, index, image_size, require_processing):
+    def __init__(self, upload_file, file_type, file_name, upload_time, uuid, index, image_size,
+                 require_processing, file_identifier, original_color):
         self.upload_file = upload_file
         self.upload_file_type = file_type
         self.upload_file_name = file_name
@@ -71,6 +73,8 @@ class UploadFiles(Base):
         self.user_uuid = uuid
         self.index = index
         self.require_processing = require_processing
+        self.file_identifier = file_identifier
+        self.original_color_image = original_color
 
 
 class ProcessedImage(Base):
@@ -88,15 +92,16 @@ class ProcessedImage(Base):
     num_LC = Column("number_of_log_compression", Integer)
     num_RV = Column("number_of_reverse_video", Integer)
     processed_file_name = Column("processed_file_name", String, primary_key=True)
-    uploadFiles_upload_file_name = Column("uploadFiles_upload_file_name", String,
-                                          ForeignKey("upload_files.upload_file_name"))
+    uploadFiles_upload_file_name = Column("uploadFiles_upload_file_name", String)
+    uploadFiles_file_identifier = Column("uploadFiles_file_identifier", String,
+                                         ForeignKey("upload_files.file_identifier"))
     user_uuid_processed = Column("user_uuid_processed", UUID, ForeignKey("users.uuid"))
     uploadfiles = relationship("UploadFiles", back_populates="processedImage")
     user = relationship("User", back_populates="processedImage")
 
     def __init__(self, processing_type, processing_time, processed_file, processed_file_type,
                  processing_latency, num_HE, num_CS, num_LC, num_RV, upload_file_name, image_size,
-                 processed_number, processed_file_name, uuid):
+                 processed_number, processed_file_name, uuid, uploadFiles_file_identifier):
         self.processing_type = processing_type
         self.processed_file_type = processed_file_type
         self.processing_time = processing_time
@@ -112,6 +117,7 @@ class ProcessedImage(Base):
         self.processed_number = processed_number
         self.processed_file_name = processed_file_name
         self.user_uuid_processed = uuid
+        self.uploadFiles_file_identifier = uploadFiles_file_identifier
 
 
 Base.metadata.create_all(engine)
@@ -192,7 +198,7 @@ def decode_b64_image(base64_string, img_format):
 
 
 def to_ui(uuid, processed_file, upload_file_type, upload_file_name, upload_file, image_size_original,
-          image_size_processed, processing_time):
+          image_size_processed, processing_time, original_file, upload_time):
     """
     to_ui method generates return information
     to the front end
@@ -210,18 +216,18 @@ def to_ui(uuid, processed_file, upload_file_type, upload_file_name, upload_file,
         if upload_file_type[index] == "JPEG" or "JPG":
             format1 = encode_nparray_to_img(decode, "PNG").decode('utf-8')
             format2 = encode_nparray_to_img(decode, "TIFF").decode('utf-8')
-            img_pair.append([upload_file[index].decode('utf-8'), processed_file[index].decode('utf-8'),
-                             format2, format1])
+            img_pair.append([original_file[index].decode('utf-8'), [processed_file[index].decode('utf-8'),
+                             format2, format1]])
         elif upload_file_type[index] == "PNG":
             format1 = encode_nparray_to_img(decode, "JPEG").decode('utf-8')
             format2 = encode_nparray_to_img(decode, "TIFF").decode('utf-8')
-            img_pair.append([upload_file[index].decode('utf-8'), format1, format2,
-                             processed_file[index].decode('utf-8')])
+            img_pair.append([original_file[index].decode('utf-8'), [format1, format2,
+                             processed_file[index].decode('utf-8')]])
         else:
             format1 = encode_nparray_to_img(decode, "PNG").decode('utf-8')
             format2 = encode_nparray_to_img(decode, "JPEG").decode('utf-8')
-            img_pair.append([upload_file[index].decode('utf-8'), format2,
-                             processed_file[index].decode('utf-8')], format1)
+            img_pair.append([original_file[index].decode('utf-8'), [format2,
+                             processed_file[index].decode('utf-8')], format1])
         img_size_pair.append([image_size_original[index], image_size_processed[index]])
 
     return {"uuid": uuid,
@@ -229,8 +235,14 @@ def to_ui(uuid, processed_file, upload_file_type, upload_file_name, upload_file,
             "histogram_pair": his_pair,
             "img_size": img_size_pair,
             "processed_time": processing_time,
-            "fileNames": upload_file_name
+            "fileNames": upload_file_name,
+            "upload_time": upload_time
             }
+
+
+class ValidationError(Exception):
+    def __int__(self, message):
+        self.message = message
 
 
 @app.route("/new_user_request", methods=['POST'])
@@ -241,21 +253,31 @@ def initial_new_image_processing():
     """
     r = request.get_json()
     data = validate(r)
-    print("data[2]",data[2])
-    print("r",r["fileNames"])
-    user_request = HandleNewUserRequest(data[6], data[0], data[4], data[5], data[1], data[3], r["fileNames"])
-    user_request.image_processing()
+    print("data[2]", data[2])
+    print("r", r["fileNames"])
     session = Session()
+    try:
+        user_uuid_list = session.query(User).all()
+        for uuid in user_uuid_list[0].uuid:
+            if uuid == data[6]:
+                raise ValidationError("duplicate key value: uuid")
+    except ValidationError as e:
+        return jsonify({"message": e.message}), 500
+
+    user_request = HandleNewUserRequest(data[6], data[0], data[4], data[5], data[1], data[3], data[2])
+    user_request.image_processing()
     user = User(user_request.uuid)
     processed_number = 0
     count = 1
     for index in data[3]:
         print(count)
         print("index", data[3])
+        file_identifier = data[6] + str(index) + '0'
+        original_color = data[8][index]
         files = UploadFiles(user_request.upload_file[index], user_request.upload_file_type[index],
                             user_request.upload_file_name[index], user_request.upload_time, user_request.uuid,
-                            index, user_request.image_size_original[index], True)
-        print("user_request.upload_file_name[index]",user_request.upload_file_name[index])
+                            index, user_request.image_size_original[index], True, file_identifier, original_color)
+        print("user_request.upload_file_name[index]", user_request.upload_file_name[index])
         processed_file_name = user_request.upload_file_name[index] + '_' + str(index)
         processed_files = ProcessedImage(user_request.processing_type, user_request.processing_time,
                                          user_request.processed_file[index], user_request.upload_file_type[index],
@@ -263,7 +285,7 @@ def initial_new_image_processing():
                                          user_request.actions[2], user_request.actions[3],
                                          user_request.upload_file_name[index],
                                          user_request.image_size_processed[index],
-                                         processed_number, processed_file_name, user_request.uuid)
+                                         processed_number, processed_file_name, user_request.uuid, file_identifier)
         files.processedImage.append(processed_files)
         user.uploadFiles.append(files)
         count += 1
@@ -283,6 +305,13 @@ def add_new_processing_to_exist_user():
     r = request.get_json()
     session = Session()
     data = second_validation(r)
+    try:
+        user_uuid_list = session.query(User).all()
+        print("user_uuid_list",user_uuid_list)
+        if data[-1] not in user_uuid_list[0].uuid:
+            raise ValidationError("Can not find uuid")
+    except ValidationError as e:
+        return jsonify({"message": e.message}), 500
     query_processedimage = session.query(ProcessedImage).filter(ProcessedImage.user_uuid_processed == data[3]).all()
     query_uploadfiles = session.query(UploadFiles).filter(UploadFiles.user_uuid == data[3]).all()
     if isinstance(query_processedimage, ProcessedImage):
@@ -315,6 +344,7 @@ def add_new_processing_to_exist_user():
     old_upload_file = []
     old_upload_file_type = []
     old_upload_file_name = data[0]
+    old_upload_file_identifier = []
     for index, i in enumerate(data[0]):
         processing_index.append(index)
         for row in query_uploadfiles:
@@ -323,6 +353,7 @@ def add_new_processing_to_exist_user():
                 print("i", i)
                 old_upload_file.append(row.upload_file)
                 old_upload_file_type.append(row.upload_file_type)
+                old_upload_file_identifier.append(row.file_identifier)
             else:
                 row.require_processing = False
                 print("index", row.require_processing)
@@ -341,6 +372,7 @@ def add_new_processing_to_exist_user():
         processed_files_name = last_prcessed_file_name[:-1]+str(int(last_prcessed_file_name[-1])+index+1)
         print("processed_files_name",  processed_files_name)
         print("update_ur.actions", update_ur.actions)
+        file_id = old_upload_file_identifier[index]
         processed_files = ProcessedImage(update_ur.processing_type, update_ur.processing_time,
                                          update_ur.processed_file[index], update_ur.upload_file_type[index],
                                          update_ur.metrics[index], update_ur.actions[0]+pre_actions_HE,
@@ -348,7 +380,7 @@ def add_new_processing_to_exist_user():
                                          update_ur.actions[2]+pre_actions_LC, update_ur.actions[3]+pre_actions_RV,
                                          update_ur.upload_file_name[index],
                                          update_ur.image_size_processed[index],
-                                         new_processed_number, processed_files_name, data[3])
+                                         new_processed_number, processed_files_name, data[3], file_id)
         session.add(processed_files)
     session.commit()
     session.close()
@@ -356,7 +388,7 @@ def add_new_processing_to_exist_user():
     return jsonify(result)
 
 
-@app.route("/get_processed_result<uuid>", methods=['GET'])
+@app.route("/get_processed_result/<uuid>", methods=['GET'])
 def get_processed_result(uuid):
     session = Session()
     info_uploadfiles = session.query(UploadFiles)\
@@ -380,7 +412,6 @@ def get_processed_result(uuid):
     out_processed_file = []
     out_processed_image_size = []
     out_original_image_size = []
-    out_original_file = []
     out_processed_time = []
     if isinstance(q, ProcessedImage):
         out_processed_file.append(q.processed_file)
@@ -401,16 +432,20 @@ def get_processed_result(uuid):
     upload_file_type = []
     upload_file_name = []
     upload_file = []
+    upload_file_original = []
     for o in info_uploadfiles:
         for b in q:
             if o.upload_file_name == b.uploadFiles_upload_file_name:
                 upload_file_type.append(o.upload_file_type)
                 upload_file_name.append(o.upload_file_name)
                 upload_file.append(o.upload_file)
-    print("upload_file", upload_file, "len(upload_file)", len(upload_file))
-    print("out_processed_file", out_processed_file, "len(out_processed_file)", len(out_processed_file))
+                upload_file_original.append(o.original_color_image)
+                upload_time = o.upload_time
+    print("len(upload_file_original)", len(upload_file_original))
+    print("len(out_processed_file)", len(out_processed_file))
     output = to_ui(uuid, out_processed_file, upload_file_type, upload_file_name, upload_file,
-                   out_original_image_size, out_processed_image_size, out_processed_time)
+                   out_original_image_size, out_processed_image_size, out_processed_time,
+                   upload_file_original, upload_time)
     session.close()
     return jsonify(output)
 
