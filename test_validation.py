@@ -65,6 +65,7 @@ def read_file_as_b64(image_path):
       "HE": False,
       "LC": False,
       "RV": False,
+      "GC": False,
       "uuid": "1",
       "files": [read_file_as_b64("test_resource/validate/pic.zip"),
                 read_file_as_b64("test_resource/validate/holk.jpg"),
@@ -82,6 +83,7 @@ def test_validate(database, expected):
       "HE": False,
       "LC": False,
       "RV": False,
+      "GC": False,
       "uuid": 1,
       "selectedFilename": ["1.jpg", "hh.zip/2.jpg"]
       },
@@ -91,6 +93,7 @@ def test_validate(database, expected):
       "HE": True,
       "LC": False,
       "RV": False,
+      "GC": False,
       "uuid": 1,
       "selectedFilename": ["2.jpg", "angelina.zip/7.jpg"]
       },
