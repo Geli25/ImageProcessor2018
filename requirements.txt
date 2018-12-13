@@ -18,3 +18,4 @@ timestring
 sqlalchemy
 Pillow
 psycopg2
+flask-Cors
