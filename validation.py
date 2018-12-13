@@ -95,6 +95,8 @@ def validate(database):
         data[4].append("LC")
     if database["RV"]:
         data[4].append("RV")
+    if database["GC"]:
+        data[4].append("GC")
     for index, send_image in enumerate(database["files"]):
         file_name = database["fileNames"][index]
         str_of_image = str(send_image)
@@ -147,6 +149,8 @@ def second_validation(new_database):
         new_data[1].append("LC")
     if new_database["RV"]:
         new_data[1].append("RV")
+    if new_database["GC"]:
+        new_data[1].append("GC")
     for image_name in new_database["selectedFilename"]:
         new_data[0].append(image_name)
     return new_data
