@@ -78,6 +78,9 @@ def add_name(access, file_name, i):
                 i + 1) + file_name[index + 2:]
             add_name(access, file_name, i + 1)
     except ValueError:
+        while file_name.find(".zip") != -1:
+            tag = file_name.find(".zip")
+            file_name = file_name[:tag] + file_name[tag+4:]
         access[2].append(file_name)
 
 
