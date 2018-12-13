@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import io
+import base64
 
 
 def is_grey(image_file):
@@ -17,7 +18,8 @@ def is_grey(image_file):
 
 
 def get_histogram(origin_image, processed_image):
-
+    origin_image = base64.b64decode(origin_image)
+    processed_image = base64.b64decode(processed_image)
     image_file = io.BytesIO(origin_image)
     src = Image.open(image_file)
     bins = range(0, 257, 2)

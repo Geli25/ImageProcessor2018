@@ -25,7 +25,5 @@ def test_get_histogram(origin_image, processed_image, expected):
         img_o = base64.b64encode(image_file.read())
     with open(processed_image, "rb") as image_file:
         img_n = base64.b64encode(image_file.read())
-    origin_image = base64.b64decode(img_o)
-    processed_image = base64.b64decode(img_n)
-    response = get_histogram(origin_image, processed_image)
+    response = get_histogram(img_o, img_n)
     assert len(response) == expected
