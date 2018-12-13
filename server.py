@@ -307,7 +307,10 @@ def add_new_processing_to_exist_user():
     try:
         user_uuid_list = session.query(User).all()
         print("user_uuid_list",user_uuid_list)
-        if data[-1] not in user_uuid_list[0].uuid:
+        list_id = []
+        for row in user_uuid_list:
+            list_id.append(row.uuid)
+        if data[-1] not in list_id:
             raise ValidationError("Can not find uuid")
     except ValidationError as e:
         return jsonify({"message": e.message}), 500
