@@ -7,7 +7,7 @@ from PIL import Image
 import io
 import shutil
 
-all_type = ["JPEG", "JPG", "TIFF", "PNG"]
+all_type = ["JPEG", "JPG", "TIFF", "PNG", "TIF"]
 
 
 def un_zip(file_name):
