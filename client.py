@@ -92,9 +92,9 @@ def img_compare(img1, img2, img3, img4):
     plt.subplot(2, 2, 2)
     plt.imshow(decode_b64_image(img2, 'jpeg'), cmap='gray')
     plt.subplot(2, 2, 3)
-    plt.imshow(decode_b64_image(img3, 'jpeg'), cmap='gray')
+    plt.imshow(decode_b64_image(img3, 'tiff'), cmap='gray')
     plt.subplot(2, 2, 4)
-    plt.imshow(decode_b64_image(img4, 'jpeg'), cmap='gray')
+    plt.imshow(decode_b64_image(img4, 'png'), cmap='gray')
     plt.show()
 
 print(len(img))
