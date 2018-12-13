@@ -42,21 +42,21 @@ def get_histogram(origin_image, processed_image):
         for i in range(0, 128):
             data[0].append({
                 "id": "{}".format(i),
-                "bin0": bins[i],
-                "bin1": second_bins[i],
-                "count": heights0[i]
+                "bin0": int(bins[i]),
+                "bin1": int(second_bins[i]),
+                "count": int(heights0[i])
             })
             data[1].append({
                 "id": "{}".format(i),
-                "bin0": bins[i],
-                "bin1": second_bins[i],
-                "count": heights1[i]
+                "bin0": int(bins[i]),
+                "bin1": int(second_bins[i]),
+                "count": int(heights1[i])
             })
             data[2].append({
                 "id": "{}".format(i),
-                "bin0": bins[i],
-                "bin1": second_bins[i],
-                "count": heights2[i]
+                "bin0": int(bins[i]),
+                "bin1": int(second_bins[i]),
+                "count": int(heights2[i])
             })
         else:
             img_o = np.array(src)
@@ -67,9 +67,9 @@ def get_histogram(origin_image, processed_image):
             for i in range(0, 128):
                 data[0].append({
                     "id": "{}".format(i),
-                    "bin0": bins[i],
-                    "bin1": second_bins[i],
-                    "count": heights4[i]
+                    "bin0": int(bins[i]),
+                    "bin1": int(second_bins[i]),
+                    "count": int(heights4[i])
                 })
     image_file = io.BytesIO(processed_image)
     src = Image.open(image_file)
@@ -81,8 +81,8 @@ def get_histogram(origin_image, processed_image):
     for i in range(0, 128):
         data[-1].append({
             "id": "{}".format(i),
-            "bin0": bins[i],
-            "bin1": second_bins[i],
-            "count": heights3[i]
+            "bin0": int(bins[i]),
+            "bin1": int(second_bins[i]),
+            "count": int(heights3[i])
         })
     return data
