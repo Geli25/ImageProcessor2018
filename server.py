@@ -197,12 +197,20 @@ def encode_nparray_to_img(np_array, img_format):
     :param img_format: image type, jpg, png, tiff
     :return: base64 encoded bytes string
     """
-    image = Image.fromarray(np_array)
-    buffer = BytesIO()
-    im2 = image.convert("L")
-    ft = 'JPEG' if img_format == 'jpg' or 'JPG' else img_format
-    im2.save(buffer, format=ft)
-    return base64.b64encode(buffer.getvalue())
+    # image = Image.fromarray(np_array)
+    # buffer = BytesIO()
+    # im2 = image.convert("L")
+    # ft = 'JPEG' if img_format == 'jpg' or 'JPG' else img_format
+    # im2.save(buffer, format=ft)
+    # output = base64.b64encode(buffer.getvalue())
+
+    with BytesIO() as out_bytes:
+        image = Image.fromarray(np_array)
+        ft = 'JPEG' if img_format == 'jpg' or 'JPG' else img_format
+        image.save(out_bytes, ft)
+        byte_data = out_bytes.getvalue()
+    output = base64.b64encode(byte_data)
+    return output
 
 
 def decode_b64_image(base64_string, img_format):
