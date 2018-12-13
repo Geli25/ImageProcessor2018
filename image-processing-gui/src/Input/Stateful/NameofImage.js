@@ -25,6 +25,10 @@ class NamesofImages extends Component{
         if (this.props.allNames.length===1||this.props.all){
             checked=true;
         }
+
+        if (this.props.allNames.length===0){
+            
+        }
         return(
             this.props.allNames.map(name=>{
                 return(

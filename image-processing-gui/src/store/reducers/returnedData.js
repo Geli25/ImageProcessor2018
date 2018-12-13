@@ -6,7 +6,8 @@ const initialState = {
     imageNames: [],
     processingTime: null,
     imageSizes: [],
-    histograms:[]
+    histograms:[],
+    uploadTime:null
 }
 
 const reducer = (curState = initialState, action) => {
@@ -31,6 +32,20 @@ const reducer = (curState = initialState, action) => {
             return stateUpdater(curState,{
                 histograms:action.histograms
             })
+        case actionTypes.UPDATE_UPLOAD_TIME:
+            return stateUpdater(curState,{
+                uploadTime: action.uploadTime
+            })
+        case actionTypes.CLEAR_RETURNED_DATA:{
+            return {
+                imagePairs: [],
+                imageNames: [],
+                processingTime: null,
+                imageSizes: [],
+                histograms: [],
+                uploadTime: null
+            };
+        }
         default:
             return curState;
     }

@@ -3,13 +3,13 @@ import stateUpdater from '../../utility/stateUpdater';
 
 const initialState={
     loading:false,
-    uuid:null,
     redirectActive:false,
     sent:false,
     gotData:false,
     histoDisplay:false,
     resetRedirect:false,
-    fileNames:[]
+    fileNames:[],
+    uuid:null
 }
 
 const reducer=(curState=initialState,action)=>{

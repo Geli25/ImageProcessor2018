@@ -2,15 +2,16 @@ import React from 'react';
 import './ProcessedImages.css';
 
 const ImagePairs = props => {
+    console.log(props.pair[1]);
     return (
         <div className="imagePairs">
             <div className="pair">
-                <img alt="originalImage" width="auto" height="200px" src={props.pair[0]} />
-                <p>Size: {props.size[0]}</p>
+                <img alt="originalImage" width="225px" height="auto" src={props.pair[0]} />
+                <p>Size: {props.size[0][0]} x {props.size[0][1]} pixels</p>
             </div>
             <div className="pair">
-                <img alt="processedImage" width="auto" height="200px" src={props.pair[1][0]} />
-                <p>Size: {props.size[1]}</p>
+                <img alt="processedImage" width="225px" height="auto" src={props.pair[1][2]} />
+                <p>Size: {props.size[1][0]} x {props.size[1][1]} pixels</p>
             </div>
         </div>
     )

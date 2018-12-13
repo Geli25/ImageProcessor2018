@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import {connect} from 'react-redux';
 import {toggleHistoDisplay} from '../../store/actions/userInfo';
 import ProcessedImages from './ProcessedImages';
@@ -7,7 +7,8 @@ import DownloadAllButton from '../Stateful/DownloadAllButton';
 const Results = props =>{
     return(
         <Fragment>
-            <h4>This processing took a total of <b>{props.processingTime}</b></h4>
+            <h4>This processing took a total of <b>{props.processingTime} seconds</b></h4>
+            <h5>Time of upload: {props.uploadTime}</h5>
             <br />
             <DownloadAllButton dlall={props.downloadAll} />
             <br />
@@ -24,7 +25,8 @@ const Results = props =>{
 const mapStatetoProps=reduxState=>{
     return{
         processingTime: reduxState.returnedData.processingTime,
-        histoDisplay:reduxState.userInfo.histoDisplay
+        uploadTime: reduxState.returnedData.uploadTime,
+        histoDisplay:reduxState.userInfo.histoDisplay,
     }
 }
 

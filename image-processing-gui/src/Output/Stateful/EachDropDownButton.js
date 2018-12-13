@@ -28,10 +28,10 @@ class EachDropDownButton extends Component {
                         <DropdownItem 
                             onClick={() => this.props.download(this.props.pair[1][0], "processed_" + fileName+".jpeg")}>.jpg/jpeg file</DropdownItem>
                         <DropdownItem
-                            // onClick={() => this.props.download(this.props.pair[1][1], "processed_" + fileName + ".png")}
+                            onClick={() => this.props.download(this.props.pair[1][2], "processed_" + fileName + ".png")}
                             >.png file</DropdownItem>
                         <DropdownItem
-                            // onClick={() => this.props.download(this.props.pair[1][2], "processed_" + fileName + ".tiff")}
+                            onClick={() => this.props.download(this.props.pair[1][1], "processed_" + fileName + ".tiff")}
                             >.tiff file</DropdownItem>
                     </DropdownMenu>
                 </ButtonDropdown>

@@ -34,3 +34,16 @@ export const updateHistograms=(histograms)=>{
         histograms:histograms
     }
 }
+
+export const updateUploadTime=(time)=>{
+    return{
+        type:actionTypes.UPDATE_UPLOAD_TIME,
+        uploadTime:time
+    }
+}
+
+export const clearReturnedData=()=>{
+    return{
+        type:actionTypes.CLEAR_RETURNED_DATA
+    }
+}

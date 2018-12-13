@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {connect} from 'react-redux';
 import './ProcessedImages.css';
 
@@ -11,10 +11,14 @@ const ProcessedImages=props=>{
         props.imagePairs.map(pair=>{
             let index = props.imagePairs.indexOf(pair);
             let name = props.imageNames[index];
-            let fileName = name.substr(0,name.indexOf('.'));
+            console.log(index);
+            console.log(pair);
+            console.log(props.imageNames);
+            console.log(name);
+            let fileName = name.substr(0, name.indexOf('.'));
             let size = props.imageSizes[index];
-            let histogram=props.histograms[index];
-            let formats=[".jpeg",".png",".tiff"];
+            // let histogram=props.histograms[index];
+            let formats=[".jpeg",".tiff",".png"];
 
             for (let type of pair[1]){
                 let typeIndex=pair[1].indexOf(type);
@@ -32,15 +36,13 @@ const ProcessedImages=props=>{
 
             return(
                 <div className="eachGroup" key={Math.random()}>
-                    {/* Images */}
-                    <ImagePairs pair={pair} size={size} />
-
-                    {/* Histograms */}
-                    {props.histoDisplay ? <HistogramGroup histogram={histogram} /> : null}
-
-                    {/* Download Button */}
-                    <EachDropDownButton pair={pair} name={name} download={props.download} />
-                    {/* <button type="button" onClick={() => props.download(pair[1], "processed_"+name)}>Download processed image</button> */}
+                    {name==="undefined"
+                        ? null
+                        : <Fragment>
+                            <ImagePairs pair={pair} size={size} />
+                            {/* {props.histoDisplay ? <HistogramGroup histogram={histogram} /> : null} */}
+                            <EachDropDownButton pair={pair} name={name} download={props.download} />
+                        </Fragment>}
                 </div >
             )
         }

@@ -31,9 +31,16 @@ class Input extends Component {
     }
 
     componentWillMount(){
+        this.setState(prevState=>
+            {
+                return{
+                    jsonData:{
+                        ...prevState.jsonData,
+                        "uuid":this.props.uuid
+                    }
+                }
+        });
         this.props.setReset();
-        this.setState({uuid:this.props.uuid});
-        console.log("setting state");
     }
     
     optionToggle=(option)=>{
@@ -60,17 +67,6 @@ class Input extends Component {
             }
         },()=>{
             for (let file of files) {
-                this.setState(prevState => {
-                    return {
-                        jsonData: {
-                            ...prevState.jsonData,
-                            "fileNames": [
-                                ...prevState.jsonData["fileNames"],
-                                file["name"]
-                            ]
-                        }
-                    }
-                });
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onloadend = () => {
@@ -81,6 +77,10 @@ class Input extends Component {
                                 "files": [
                                     ...prevState.jsonData["files"],
                                     reader.result
+                                ],
+                                "fileNames":[
+                                    ...prevState.jsonData["fileNames"],
+                                    file["name"]
                                 ]
                             }
                         }
@@ -91,84 +91,87 @@ class Input extends Component {
     }
 
     submitButton=()=>{
-        if (this.props.sentStatus===true){
-            let newData = {
-                "uuid": this.props.uuid,
-                "HE": this.state.jsonData.HE,
-                "CS": this.state.jsonData.CS,
-                "LC": this.state.jsonData.LC,
-                "RV": this.state.jsonData.RV,
-                "selectedFilename": this.props.selectedFiles,
-            }
-            this.props.setLoading(true);
-            this.setState({
-                loading: true},
-            ()=>console.log(newData));
-            this.props.setRedirect(true);
+    //    **this is a fake simulation to test out functionality**
+    //     if (this.props.sentStatus===true){
+    //         let newData = {
+    //             "uuid": this.props.uuid,
+    //             "HE": this.state.jsonData.HE,
+    //             "CS": this.state.jsonData.CS,
+    //             "LC": this.state.jsonData.LC,
+    //             "RV": this.state.jsonData.RV,
+    //             "selectedFilename": this.props.selectedFiles,
+    //         }
+    //         this.props.setLoading(true);
+    //         this.setState({
+    //             loading: true},
+    //         ()=>console.log(newData));
+    //         this.props.setRedirect(true);
 
-        }
-        else{
-            this.setState({ loading: true }, () => {
-                console.log(this.state);
-                console.log(this.props.uuid);
-            })
-            this.props.setLoading(true);
-            this.props.sent();
-            this.props.updateFileNames(this.state.jsonData.fileNames);
-            this.props.setRedirect(true);
-        }
-    }
-    // if (this.props.sentStatus===true){
-    //     this.setState({ loading: true });
-    //     // this.props.setLoading(true);
-    //     let newData = {
-    //         "uuid": this.props.uuid,
-    //         "HE": this.state.jsonData.HE,
-    //         "CS": this.state.jsonData.CS,
-    //         "LC": this.state.jsonData.LC,
-    //         "RV": this.state.jsonData.RV,
-    //         "selectedFilename": this.props.selectedFiles
     //     }
-    //     axios.post('http://127.0.0.1:5000/new_data', newData, {
-    //         onUploadProgress: progressEvent => {
-    //             let progressPercent = (progressEvent.loaded / progressEvent.total);
-    //             console.log(progressPercent);
-    //         }
-    //     }).then(response => {
-    //         this.props.setLoading(false);
-    //         this.setState({ loading: false }, () => {
-    //             console.log(newData, response);
-    //         });
-    //         this.props.setRedirect(true);
-    //     }).catch(err => {
-    //         this.props.setLoading(false);
-    //         this.setState({ loading: false });
-    //         alert("Something went wrong, please try again. Error: " + err);
-    //     })
-    // }
-    // else{
-    //     this.props.setLoading(true);
-    //     this.setState({loading:true});
-    //     axios.post('http://vcm-7506.vm.duke.edu:5000/new_user', this.state.jsonData, {
-    //         onUploadProgress: progressEvent => {
-    //             let progressPercent = (progressEvent.loaded / progressEvent.total);
-    //             console.log(progressPercent);
-    //         }
-    //     }).then(response => {
-    //         this.setState({loading: false})
+    //     else{
+    //         this.setState({ loading: true }, () => {
+    //             console.log(this.state);
+    //             console.log(this.props.uuid);
+    //         })
+    //         this.props.setLoading(true);
     //         this.props.sent();
-    //         this.props.setLoading(false);
-    //         console.log(this.state.jsonData, response);
-    //         this.props.updateFileNames(response);
+    //         this.props.updateFileNames(this.state.jsonData.fileNames);
     //         this.props.setRedirect(true);
-    //     }).catch(err => {
-    //         this.props.setLoading(false);
-    //         console.log(this.state);
-    //         this.setState({loading:false});
-    //         alert("Something went wrong, please try again. Error: " + err);
-    //     })
+    //     }
     // }
-// }
+    if (this.props.sentStatus===true){
+        this.setState({ loading: true });
+        console.log(this.state.jsonData.uuid);
+        // this.props.setLoading(true);
+        let newData = {
+            "uuid": this.props.uuid,
+            "HE": this.state.jsonData.HE,
+            "CS": this.state.jsonData.CS,
+            "LC": this.state.jsonData.LC,
+            "RV": this.state.jsonData.RV,
+            "selectedFilename": this.props.selectedFiles
+        }
+        axios.post('http://vcm-7506.vm.duke.edu:5003/update_user_request', newData, {
+            onUploadProgress: progressEvent => {
+                let progressPercent = (progressEvent.loaded / progressEvent.total);
+                console.log(progressPercent);
+            }
+        }).then(response => {
+            this.props.setLoading(false);
+            this.setState({ loading: false }, () => {
+                console.log(newData, response);
+            });
+            this.props.setRedirect(true);
+        }).catch(err => {
+            console.log(newData);
+            this.props.setLoading(false);
+            this.setState({ loading: false });
+            alert("Something went wrong, please try again. Error: " + err);
+        })
+    }
+    else{
+        this.props.setLoading(true);
+        this.setState({loading:true});
+        axios.post('http://vcm-7506.vm.duke.edu:5003/new_user_request', this.state.jsonData, {
+            onUploadProgress: progressEvent => {
+                let progressPercent = (progressEvent.loaded / progressEvent.total);
+                console.log(progressPercent);
+            }
+        }).then(response => {
+            this.props.updateFileNames(response.data.file_names);
+            this.setState({loading: false})
+            this.props.sent();
+            this.props.setLoading(false);
+            console.log(this.state.jsonData, response.data.file_names);
+            this.props.setRedirect(true);
+        }).catch(err => {
+            this.props.setLoading(false);
+            console.log(this.state);
+            this.setState({loading:false});
+            alert("Something went wrong, please try again. Error: " + err);
+        })
+    }
+}
 
 
     render() {
@@ -184,7 +187,10 @@ class Input extends Component {
             }
         }
         else if (this.props.sentStatus){
-            if (this.props.selectedFiles.length===0){
+            if (this.props.selectedFiles.length === 0 || ((!this.state.jsonData["HE"]
+                && !this.state.jsonData["CS"]
+                && !this.state.jsonData["RV"]
+                && !this.state.jsonData["LC"]))){
                 disable=true
             }
         }
@@ -217,8 +223,8 @@ class Input extends Component {
 }
 const mapStatetoProps=reduxState=>{
     return{
+        uuid: reduxState.userInfo.uuid,
         sentStatus:reduxState.userInfo.sent,
-        uuid:reduxState.userInfo.uuid,
         redirectActive:reduxState.userInfo.redirect,
         fileNames:reduxState.userInfo.fileNames,
         selectedFiles:reduxState.selectedfiles.selectedFiles
