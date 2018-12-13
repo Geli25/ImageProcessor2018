@@ -114,6 +114,7 @@ class ProcessedImage(Base):
     num_CS = Column("number_of_contrast_stretching", Integer)
     num_LC = Column("number_of_log_compression", Integer)
     num_RV = Column("number_of_reverse_video", Integer)
+    num_GC = Column("number_of_gemma_correction", Integer)
     processed_file_name = Column("processed_file_name", String, primary_key=True)
     uploadFiles_upload_file_name = Column("uploadFiles_upload_file_name", String)
     uploadFiles_file_identifier = Column("uploadFiles_file_identifier", String,
@@ -123,7 +124,7 @@ class ProcessedImage(Base):
     user = relationship("User", back_populates="processedImage")
 
     def __init__(self, processing_type, processing_time, processed_file, processed_file_type,
-                 processing_latency, num_HE, num_CS, num_LC, num_RV, upload_file_name, image_size,
+                 processing_latency, num_HE, num_CS, num_LC, num_RV, num_GC, upload_file_name, image_size,
                  processed_number, processed_file_name, uuid, uploadFiles_file_identifier):
         self.processing_type = processing_type
         self.processed_file_type = processed_file_type
@@ -136,6 +137,7 @@ class ProcessedImage(Base):
         self.num_CS = num_CS
         self.num_LC = num_LC
         self.num_RV = num_RV
+        self.num_GC = num_GC
         self.uploadFiles_upload_file_name = upload_file_name
         self.processed_number = processed_number
         self.processed_file_name = processed_file_name
@@ -166,7 +168,7 @@ class HandleNewUserRequest(object):
         self.processed_file = []
         self.image_size_original = []
         self.image_size_processed = []
-        self.actions = [0, 0, 0, 0]  # [num_hist_eq, num_contr_stre, num_log_com, num_reverse_video]
+        self.actions = [0, 0, 0, 0, 0]  # [num_hist_eq, num_contr_stre, num_log_com, num_reverse_video]
         self.metrics = []  # processing latency
 
     def image_processing(self):
@@ -317,7 +319,7 @@ def initial_new_image_processing():
         processed_files = ProcessedImage(user_request.processing_type, user_request.processing_time,
                                          user_request.processed_file[index], user_request.upload_file_type[index],
                                          user_request.metrics[index], user_request.actions[0], user_request.actions[1],
-                                         user_request.actions[2], user_request.actions[3],
+                                         user_request.actions[2], user_request.actions[3], user_request.actions[4],
                                          user_request.upload_file_name[index],
                                          user_request.image_size_processed[index],
                                          processed_number, processed_file_name, user_request.uuid, file_identifier)
@@ -364,18 +366,21 @@ def add_new_processing_to_exist_user():
         pre_actions_CS = query_processedimage.num_CS
         pre_actions_RV = query_processedimage.num_RV
         pre_actions_LC = query_processedimage.num_LC
+        pre_actions_GC = query_processedimage.num_GC
     else:
         total = []
         total_he = []
         total_cs = []
         total_rv = []
         total_lc = []
+        total_gc = []
         for row in query_processedimage:
             total.append(row.processed_number)
             total_he.append(row.num_HE)
             total_cs.append(row.num_CS)
             total_rv.append(row.num_RV)
             total_lc.append(row.num_LC)
+            total_gc.append(row.num_GC)
             last_prcessed_file_name = row.processed_file_name
         new_processed_number = max(total) + 1
         print(total_he)
@@ -383,6 +388,7 @@ def add_new_processing_to_exist_user():
         pre_actions_CS = max(total_cs)
         pre_actions_RV = max(total_rv)
         pre_actions_LC = max(total_lc)
+        pre_actions_GC = max(total_gc)
     processing_index = []
     old_upload_file = []
     old_upload_file_type = []
@@ -421,6 +427,7 @@ def add_new_processing_to_exist_user():
                                          update_ur.metrics[index], update_ur.actions[0]+pre_actions_HE,
                                          update_ur.actions[1]+pre_actions_CS,
                                          update_ur.actions[2]+pre_actions_LC, update_ur.actions[3]+pre_actions_RV,
+                                         update_ur.actions[4]+pre_actions_GC,
                                          update_ur.upload_file_name[index],
                                          update_ur.image_size_processed[index],
                                          new_processed_number, processed_files_name, data[3], file_id)
@@ -456,7 +463,7 @@ def get_processed_result(uuid):
     print("processed_img_index", processed_img_index)
     q = session.query(ProcessedImage).filter(ProcessedImage.user_uuid_processed == uuid)\
         .filter(ProcessedImage.processed_number == processed_img_index).all()
-    print("q",len(q))
+    print("q", len(q))
     out_processed_file = []
     out_processed_image_size = []
     out_original_image_size = []
@@ -487,7 +494,18 @@ def get_processed_result(uuid):
                 upload_file_type.append(o.upload_file_type)
                 upload_file_name.append(o.upload_file_name)
                 upload_file.append(o.upload_file)
-                upload_file_original.append(o.original_color_image)
+                if o.upload_file_type == "tiff" or "tif" or "TIFF" or "tiff":
+                    img1 = decode_b64_image(o.original_color_image, o.upload_file_type)
+                    with BytesIO() as out_bytes:
+                        image = Image.fromarray(img1)
+                        im2 = image.convert("RGB")
+                        ft = 'JPEG'
+                        im2.save(out_bytes, ft)
+                        byte_data = out_bytes.getvalue()
+                    img2 = base64.b64encode(byte_data)
+                else:
+                    img2 = o.original_color_image
+                upload_file_original.append(img2)
                 upload_time = o.upload_time
     print("len(upload_file_original)", len(upload_file_original))
     print("len(out_processed_file)", len(out_processed_file))
