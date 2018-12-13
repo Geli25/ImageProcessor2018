@@ -258,12 +258,12 @@ def initial_new_image_processing():
     session = Session()
     try:
         user_uuid_list = session.query(User).all()
-        for uuid in user_uuid_list[0].uuid:
-            if uuid == data[6]:
-                raise ValidationError("duplicate key value: uuid")
+        if user_uuid_list:
+            for uuid in user_uuid_list[0].uuid:
+                if uuid == data[6]:
+                    raise ValidationError("duplicate key value: uuid")
     except ValidationError as e:
         return jsonify({"message": e.message}), 500
-
     user_request = HandleNewUserRequest(data[6], data[0], data[4], data[5], data[1], data[3], data[2])
     user_request.image_processing()
     user = User(user_request.uuid)
@@ -278,7 +278,7 @@ def initial_new_image_processing():
                             user_request.upload_file_name[index], user_request.upload_time, user_request.uuid,
                             index, user_request.image_size_original[index], True, file_identifier, original_color)
         print("user_request.upload_file_name[index]", user_request.upload_file_name[index])
-        processed_file_name = user_request.upload_file_name[index] + '_' + str(index)
+        processed_file_name = data[6] + user_request.upload_file_name[index] + '_' + str(index)
         processed_files = ProcessedImage(user_request.processing_type, user_request.processing_time,
                                          user_request.processed_file[index], user_request.upload_file_type[index],
                                          user_request.metrics[index], user_request.actions[0], user_request.actions[1],
