@@ -1,24 +1,54 @@
-This document is for setting up the postsql database and server.py on vcm 
-* ubuntu system 16.04 as a reference documentation 
+# BME 590 Final Project: Image Processor 
 
-sudo apt-get install postgresql (already installed in the vcm7506)
+##### Team member: Steven Hua, Angelina Liu, Haitong(Tina) Wang 
+##### Date: December 13, 2018 
 
-for checking the db
-sudo systemctl stop postgresql.service
-sudo systemctl start postgresql.service
-sudo systemctl enable postgresql.service
-sudo systemctl status postgresql.service
+----
+_This document is for setting up the postgres database and server.py on vcm_
+* ubuntu system 16.04  
+----
 
-login as postgres user: sudo su -l postgres
-PostgreSQL runs at port 5432 by default 
+**1.1 Database Instruction**
 
-CREATE DATABASE bme590finalproject;
-CREATE USER hw188 WITH PASSWORD '123456';
-GRANT ALL PRIVILEGES ON DATABASE bme590finalproject TO hw188;
+  1.1.1 Install postgresql on local machine (already installed in the vcm7506)
+    
+    sudo apt-get install postgresql 
+  
+  1.1.2 Create new Database
+    
+  1.1.2.1 Login to postgres (PostgreSQL runs at port 5432 by default )
+    
+    sudo su -l postgres
+    psql 
+    
+  1.1.2.2 Create new Database and role 
+  
+    CREATE DATABASE bme590finalproject;
+    CREATE USER {USERNAME} WITH PASSWORD {PASSWORD};
+    GRANT ALL PRIVILEGES ON DATABASE bme590finalproject TO {USERNAME};
+  
+  1.1.2.3 To restore a vanilla setting 
+    
+    DROP DATABASE bme590finalproject;
+  
+  1.1.3 Check if postgres is active/ run  
+  
+    sudo systemctl stop postgresql.service
+    sudo systemctl start postgresql.service
+    sudo systemctl enable postgresql.service
+    sudo systemctl status postgresql.service
 
-DROP DATABASE bme590finalproject;
+**1.2 VCM Deployment Instruction**  
+
+    sudo apt-get install python3-pip screen
+    pip3 install virtualenv
+    git clone {HTTP TO GIT REPOSITORIES} 
+    virtualenv -p python3 env 
+    source env/bin/activate
+    pip install -r requirments.txt
+  
+  Build DATABASE AND START IT, Then run 
+  
+    gunicorn --bind 0.0.0.0:5000 server:app
 
 
-https://www.pythoncentral.io/understanding-python-sqlalchemy-session/
-https://suhas.org/sqlalchemy-tutorial/
-https://websiteforstudents.com/installing-postgresql-10-on-ubuntu-16-04-17-10-18-04/
