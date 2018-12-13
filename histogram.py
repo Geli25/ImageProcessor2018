@@ -23,11 +23,12 @@ def get_histogram(origin_image, processed_image):
     image_file = io.BytesIO(origin_image)
     src = Image.open(image_file)
     bins = range(0, 257, 4)
-    second_bins = range(2, 257, 4)
+    second_bins = range(4, 257, 4)
     data = [[], []]
     if is_grey(image_file) == 1:
         data.append([])
         data.append([])
+        src = src.convert("RGB")
         r, g, b = src.split()
         ar = np.array(r).flatten()
         heights0, bins0 = np.histogram(ar, bins=bins)
@@ -58,19 +59,19 @@ def get_histogram(origin_image, processed_image):
                 "bin1": int(second_bins[i]),
                 "count": int(heights2[i])
             })
-        else:
-            img_o = np.array(src)
-            arr_o = img_o.flatten()
-            # n, bins, patches = plt.hist(arr, bins=bins,
-            #  density=1, color='grey', alpha=0.75)
-            heights4, bins4 = np.histogram(arr_o, bins=bins)
-            for i in range(0, 64):
-                data[0].append({
-                    "id": "{}".format(i+300),
-                    "bin0": int(bins[i]),
-                    "bin1": int(second_bins[i]),
-                    "count": int(heights4[i])
-                })
+    else:
+        img_o = np.array(src)
+        arr_o = img_o.flatten()
+        # n, bins, patches = plt.hist(arr, bins=bins,
+        #  density=1, color='grey', alpha=0.75)
+        heights4, bins4 = np.histogram(arr_o, bins=bins)
+        for i in range(0, 64):
+            data[0].append({
+                "id": "{}".format(i+300),
+                "bin0": int(bins[i]),
+                "bin1": int(second_bins[i]),
+                "count": int(heights4[i])
+            })
     image_file = io.BytesIO(processed_image)
     src = Image.open(image_file)
     img = np.array(src)
