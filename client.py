@@ -81,6 +81,8 @@ uuid1 = '304b45ff-6634-4dfa-a441-e1033781ab62'
 r2 = requests.get("http://127.0.0.1:5000/get_processed_result/{0}".format(uuid1))
 print(r2.json)
 img = r2.json()['img_pair']
+his = r2.json()['histogram_pair']
+print(len(his))
 
 def img_compare(img1, img2, img3, img4):
     plt.subplot(2, 2, 1)
