@@ -21,10 +21,12 @@ def decode_b64_image(base64_string, img_format):
     return decoded_img
 
 """
-img_name = ["ISIC_0000000.jpg", "ISIC_0000001.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
-            "ISIC_0000005.jpg", "ISIC_0000006.jpg", "ISIC_0000007.jpg", "ISIC_0000008.jpg", "ISIC_0000009.jpg"]
+#img_name = ["ISIC_0000000.jpg", "ISIC_0000001.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
+#            "ISIC_0000005.jpg", "ISIC_0000006.jpg", "ISIC_0000007.jpg", "ISIC_0000008.jpg", "ISIC_0000009.jpg"]
+
+cat_img = ["cat1.jpg", "cat2.jpeg"]
 files = []
-for i in img_name:
+for i in cat_img:
     with open(i, "rb") as image_file:
         encode = base64.b64encode(image_file.read()).decode('utf-8')
     files.append(encode)
@@ -36,7 +38,7 @@ p1 = {
     "LC": True,
     "RV": False,
     "uuid": uuid1,
-    "fileNames": img_name
+    "fileNames": cat_img
 }
 print(uuid1)
 r1 = requests.post("http://127.0.0.1:5000/new_user_request", json=p1)
@@ -61,7 +63,7 @@ r1 = requests.post("http://127.0.0.1:5000/new_user_request", json=p1)
 print(r1.text)
 """
 """
-uuid1 = '304b45ff-6634-4dfa-a441-e1033781ab62'
+uuid1 = '2b2b10cb-9e68-4eca-84c1-aec8369419f5'
 img_name = ["ISIC_0000000.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
             "ISIC_0000005.jpg"]
 p1 = {
@@ -77,7 +79,7 @@ print(r1.text)
 
 """
 
-uuid1 = '304b45ff-6634-4dfa-a441-e1033781ab62'
+uuid1 = '2b2b10cb-9e68-4eca-84c1-aec8369419f5'
 r2 = requests.get("http://127.0.0.1:5000/get_processed_result/{0}".format(uuid1))
 print(r2.json)
 img = r2.json()['img_pair']

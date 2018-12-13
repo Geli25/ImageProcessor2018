@@ -1,5 +1,5 @@
 This document is for setting up the postsql database and server.py on vcm 
-* ubuntu system 
+* ubuntu system 16.04 as a reference documentation 
 
 sudo apt-get install postgresql (already installed in the vcm7506)
 
