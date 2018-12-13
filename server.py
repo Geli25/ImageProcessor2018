@@ -13,6 +13,7 @@ from PIL import Image
 from io import BytesIO
 from validation import validate, second_validation
 import numpy as np
+from flask_cors import CORS
 """
 File name: server.py 
 Main: this is the server.py file to build the entire image 
@@ -24,6 +25,7 @@ Date: Dec 9th 2018
 app = Flask(__name__)
 engine = create_engine("postgresql://hw188:{0}@localhost:5432/bme590finalproject".format('123456'), max_overflow=20,
                        client_encoding='utf8')
+CORS(app)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
@@ -268,7 +270,8 @@ def initial_new_image_processing():
     session.add(user)
     session.commit()
     if not data[7]:
-        result = {"message": "Successfully added and processed user request"}
+        result = {"message": "Successfully added and processed user request",
+                  "file_names": data[2]}
     else:
         result = {data[7]}
     session.close()
