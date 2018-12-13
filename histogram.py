@@ -47,13 +47,13 @@ def get_histogram(origin_image, processed_image):
                 "count": int(heights0[i])
             })
             data[1].append({
-                "id": "{}".format(i),
+                "id": "{}".format(i+100),
                 "bin0": int(bins[i]),
                 "bin1": int(second_bins[i]),
                 "count": int(heights1[i])
             })
             data[2].append({
-                "id": "{}".format(i),
+                "id": "{}".format(i+200),
                 "bin0": int(bins[i]),
                 "bin1": int(second_bins[i]),
                 "count": int(heights2[i])
@@ -66,7 +66,7 @@ def get_histogram(origin_image, processed_image):
             heights4, bins4 = np.histogram(arr_o, bins=bins)
             for i in range(0, 64):
                 data[0].append({
-                    "id": "{}".format(i),
+                    "id": "{}".format(i+300),
                     "bin0": int(bins[i]),
                     "bin1": int(second_bins[i]),
                     "count": int(heights4[i])
@@ -80,7 +80,7 @@ def get_histogram(origin_image, processed_image):
     heights3, bins3 = np.histogram(arr, bins=bins)
     for i in range(0, 64):
         data[-1].append({
-            "id": "{}".format(i),
+            "id": "{}".format(i+400),
             "bin0": int(bins[i]),
             "bin1": int(second_bins[i]),
             "count": int(heights3[i])
