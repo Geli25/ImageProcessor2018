@@ -1,8 +1,5 @@
 numpy
 scipy
-pandas
-ipython
-jupyter
 matplotlib
 scikit-image
 scikit-learn

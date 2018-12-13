@@ -206,8 +206,9 @@ def encode_nparray_to_img(np_array, img_format):
 
     with BytesIO() as out_bytes:
         image = Image.fromarray(np_array)
+        im2 = image.convert("L")
         ft = 'JPEG' if img_format == 'jpg' or 'JPG' else img_format
-        image.save(out_bytes, ft)
+        im2.save(out_bytes, ft)
         byte_data = out_bytes.getvalue()
     output = base64.b64encode(byte_data)
     return output
