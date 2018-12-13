@@ -210,6 +210,7 @@ def to_ui(uuid, processed_file, upload_file_type, upload_file_name, upload_file,
 
     for index, files in enumerate(upload_file):
         decode = decode_b64_image(processed_file[index], upload_file_type[index])
+        print("original_file.shape",len(original_file))
         decode_his = get_histogram(original_file[index], processed_file[index])
         his_pair.append(decode_his)
         if upload_file_type[index] == "JPEG" or "JPG":
