@@ -37,6 +37,7 @@ p1 = {
     "CS": False,
     "LC": True,
     "RV": False,
+    "GC": True,
     "uuid": uuid1,
     "fileNames": cat_img
 }
@@ -55,6 +56,7 @@ p1 = {
     "CS": False,
     "LC": True,
     "RV": False,
+    "GC": True,
     "uuid": uuid1,
     "fileNames": ["test.jpg"]
 }
@@ -63,23 +65,25 @@ r1 = requests.post("http://127.0.0.1:5000/new_user_request", json=p1)
 print(r1.text)
 """
 """
-uuid1 = '2b2b10cb-9e68-4eca-84c1-aec8369419f5'
-img_name = ["ISIC_0000000.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
-            "ISIC_0000005.jpg"]
+uuid1 = '8963c92d-c066-460d-9e54-7024bd1b0111'
+#img_name = ["ISIC_0000000.jpg", "ISIC_0000002.jpg", "ISIC_0000003.jpg", "ISIC_0000004.jpg",
+#           "ISIC_0000005.jpg"]
+cat_img = ["cat1.jpg", "cat2.jpeg"]
 p1 = {
     "HE": False,
     "CS": True,
     "LC": True,
     "RV": True,
+    "GC": True,
     "uuid": uuid1,
-    "selectedFilename": img_name
+    "selectedFilename": cat_img
 }
 r1 = requests.post("http://127.0.0.1:5000/update_user_request", json= p1)
 print(r1.text)
 
 """
 
-uuid1 = '2b2b10cb-9e68-4eca-84c1-aec8369419f5'
+uuid1 = '8963c92d-c066-460d-9e54-7024bd1b0111'
 r2 = requests.get("http://127.0.0.1:5000/get_processed_result/{0}".format(uuid1))
 print(r2.json)
 img = r2.json()['img_pair']
