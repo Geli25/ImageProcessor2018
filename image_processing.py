@@ -32,13 +32,18 @@ def process_image(image, list_processing_method, actions):
             output = exposure.rescale_intensity(output, in_range=(p5, p95))
             actions[1] += 1
         elif n is "LC":
-            output = exposure.adjust_log(output)
+            output = exposure.adjust_log(output, 1)
             output = exposure.rescale_intensity(output, out_range=(0, 255))
             actions[2] += 1
         elif n is "RV":
             output = util.invert(output)
             output = exposure.rescale_intensity(output, out_range=(0, 255))
             actions[3] += 1
+        elif n is "GC":
+            output = exposure.adjust_gamma(output, 2)
+            output = exposure.rescale_intensity(output, out_range=(0, 255))
+            actions[4] += 1
+
     size = image.shape
 
     # add another feature for the phase 2
@@ -49,8 +54,8 @@ if __name__ == "__main__":
     image = imread('ISIC_0000009.jpg')
     print('image:', image.shape)
     image = image[:, :, 0]
-    list_processing_method = ['CS', 'LC', 'RV']
-    actions = [0, 0, 0, 0]
+    list_processing_method = ['GC']
+    actions = [0, 0, 0, 0, 0]
     output, actions, size = process_image(image, list_processing_method, actions)
     plt.subplot(1, 2, 1)
     plt.imshow(image, interpolation='nearest', cmap='gray')
