@@ -336,6 +336,7 @@ def initial_new_image_processing():
     user = User(user_request.uuid)
     processed_number = 0
     count = 1
+    print("data[3]", data[3])
     for index in data[3]:
         file_identifier = data[6] + str(index) + '0'
         original_color = data[8][index]
@@ -463,9 +464,9 @@ def add_new_processing_to_exist_user():
     # for number of file need to be processed
     for row in query_uploadfiles:
         for index, fn in enumerate(data[0]):
+            print('fn', fn)
+            print("row.upload_file_name", row.upload_file_name)
             if fn == row.upload_file_name:
-                print('fn', fn)
-                print("row.upload_file_name", row.upload_file_name)
                 processed_files_name = last_processed_file_name[:-1] + \
                     str(int(last_processed_file_name[-1]) + index + 1)
                 print('processed_files_name', processed_files_name)
