@@ -37,7 +37,7 @@ const reducer=(curState=initialState,action)=>{
             })
         case actionTypes.SET_REDIRECT:
             return stateUpdater(curState,{
-                redirect:action.redirect
+                redirectActive:action.redirect
             })
         case actionTypes.UPDATE_FILENAMES:{
             return stateUpdater(curState,{
@@ -46,7 +46,7 @@ const reducer=(curState=initialState,action)=>{
         }
         case actionTypes.SET_RESET:{
             return stateUpdater(curState,{
-                resetRedirect:false
+                resetRedirect:action.redirect
             })
         }
         case actionTypes.GOT_DATA:{

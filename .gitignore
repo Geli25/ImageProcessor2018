@@ -13,4 +13,3 @@ env/
 .venv/
 .__pycache__/
 _build
-.firebase

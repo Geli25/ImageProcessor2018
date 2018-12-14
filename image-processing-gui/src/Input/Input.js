@@ -2,9 +2,10 @@ import React, { Component, Fragment } from 'react';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import * as actionCreators from '../store/actions/userInfo';
+import * as actionCreator from '../store/actions/selectedFiles';
 import {Line} from 'rc-progress';
 import {Button} from 'reactstrap';
-import {Redirect} from 'react-router-dom';
+import {Redirect,Prompt} from 'react-router-dom';
 import Welcome from './Stateless/Welcome';
 import Instructions from './Stateless/Instructions';
 import SelectImages from './Stateless/SelectImages';
@@ -44,6 +45,12 @@ class Input extends Component {
                 }
         });
         this.props.setReset();
+    }
+
+    componentWillUnmount(){
+        if (this.state.loading){
+            window.location.reload();
+        }
     }
     
     optionToggle=(option)=>{
@@ -209,7 +216,8 @@ class Input extends Component {
                 || (!this.state.jsonData["HE"] 
                 && !this.state.jsonData["CS"] 
                 && !this.state.jsonData["RV"]
-                && !this.state.jsonData["LC"])){
+                && !this.state.jsonData["LC"]
+                && !this.state.jsonData["GC"])){
                 disable=true;
             }
         }
@@ -217,13 +225,16 @@ class Input extends Component {
             if (this.props.selectedFiles.length === 0 || ((!this.state.jsonData["HE"]
                 && !this.state.jsonData["CS"]
                 && !this.state.jsonData["RV"]
-                && !this.state.jsonData["LC"]))){
+                && !this.state.jsonData["LC"]
+                && !this.state.jsonData["GC"]))){
                 disable=true
             }
         }
 
         let content = (
             <Fragment>
+                <Prompt when={this.props.masterloading} message="Navigating to another page when data is not fully downloaded
+                 will cause an error which resets the app. Do you want to proceed?" />
                 <Welcome />
                 <Instructions />
                 {this.props.sentStatus ? <Instruction2 /> 
@@ -253,9 +264,10 @@ const mapStatetoProps=reduxState=>{
     return{
         uuid: reduxState.userInfo.uuid,
         sentStatus:reduxState.userInfo.sent,
-        redirectActive:reduxState.userInfo.redirect,
+        redirectActive:reduxState.userInfo.redirectActive,
         fileNames:reduxState.userInfo.fileNames,
-        selectedFiles:reduxState.selectedfiles.selectedFiles
+        selectedFiles:reduxState.selectedfiles.selectedFiles,
+        masterloading:reduxState.userInfo.loading
     }
 }
 
@@ -266,7 +278,7 @@ const mapDispatchtoProps=dispatch=>{
         sent: () => dispatch(actionCreators.sentTrue()),
         setRedirect: (bool) => dispatch(actionCreators.setRedirect(bool)),
         updateFileNames: (files) => dispatch(actionCreators.updateFileNames(files)),
-        setReset: (bool) => dispatch(actionCreators.setReset(bool)),
+        setReset: (bool) => dispatch(actionCreators.setReset(bool))
     }
 }
 

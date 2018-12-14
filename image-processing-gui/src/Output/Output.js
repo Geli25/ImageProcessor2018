@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import {Redirect} from 'react-router-dom';
+import {Redirect, Prompt} from 'react-router-dom';
 import axios from 'axios';
 import {connect} from 'react-redux';
 import { Circle } from 'rc-progress';
@@ -46,21 +46,17 @@ class Output extends Component {
     }
 
 
-
     componentWillUnmount(){
         if (this.state.loading){
-            alert("Please do NOT navigate to another page while loading. Resetting...")
-            this.resetApp();
+            window.location.reload();
         }
     }
 
 
     resetApp = () => {
-        const uuidv4 = require('uuid/v4');
-        let newUuid = uuidv4();
-        this.props.resetApp(newUuid);
+        this.props.resetApp();
         this.props.clearSelected();
-        console.log(newUuid);
+        console.log(this.props.uuid);
     }
 
     processImages=(imagePairs,fileNames)=>{
@@ -144,6 +140,7 @@ class Output extends Component {
                     this.processImages(response.data.img_pair, response.data.fileNames);
                     this.props.gotData(true);
                     this.props.refreshData(false);
+                    this.setState({ loading: false, percent: 0, color:"#FFA07A"})
                 }
             }).catch(err=>{
                 console.log(err);
@@ -223,6 +220,8 @@ class Output extends Component {
 
         return (
             <div>
+                <Prompt when={this.props.loading} message="Navigating to another page when data is not fully downloaded will
+                cause  an error which resets the app. Do you want to proceed?" />
                 {this.props.sentStatus 
                     && !this.state.loading 
                     ? <Fragment>
@@ -253,7 +252,8 @@ const mapStatetoProps=reduxState=>{
         sentStatus:reduxState.userInfo.sent,
         resetRedirect: reduxState.userInfo.resetRedirect,
         hasData:reduxState.userInfo.gotData,
-        refreshedData:reduxState.userInfo.refreshedData
+        refreshedData:reduxState.userInfo.refreshedData,
+        masterloading:reduxState.userInfo.loading
     }
 }
 
@@ -261,7 +261,7 @@ const mapDispatchtoProps=dispatch=>{
     return{
         setRedirect:(bool)=>dispatch(actionCreators.setRedirect(bool)),
         gotData:(bool)=>dispatch(actionCreators.gotData(bool)),
-        resetApp:(uuid)=>dispatch(actionCreators.resetApp(uuid)),
+        resetApp:()=>dispatch(actionCreators.resetApp()),
         updateImagePairs:(pairs)=>dispatch(actionCreator.waitForProcessedImage(pairs)),
         updateImageSizes: (sizes) => dispatch(actionCreator.updateImageSizes(sizes)),
         updateProcessingTime:(time)=>dispatch(actionCreator.updateProcessingTime(time)),

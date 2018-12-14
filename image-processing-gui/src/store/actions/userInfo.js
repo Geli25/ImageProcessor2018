@@ -1,9 +1,11 @@
 import * as actionTypes from './actionTypes';
 
-export const resetApp=(uuid)=>{
+export const resetApp=()=>{
+    const uuidv4 = require('uuid/v4');
+    let newUuid = uuidv4();
     return{
         type:actionTypes.RESET_APP,
-        uuid:uuid
+        uuid:newUuid
     }
 }
 
@@ -34,9 +36,10 @@ export const updateFileNames=(files)=>{
     }
 }
 
-export const setReset=()=>{
+export const setReset=(bool)=>{
     return{
-        type:actionTypes.SET_RESET
+        type:actionTypes.SET_RESET,
+        redirect:bool
     }
 }
 
