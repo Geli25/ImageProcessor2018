@@ -418,7 +418,7 @@ def add_new_processing_to_exist_user():
         total_rv = []
         total_lc = []
         total_gc = []
-        last_processed_file_name_buff = []
+        number_max = 0
         for row in query_processedimage:
             total.append(row.processed_number)
             total_he.append(row.num_HE)
@@ -426,15 +426,12 @@ def add_new_processing_to_exist_user():
             total_rv.append(row.num_RV)
             total_lc.append(row.num_LC)
             total_gc.append(row.num_GC)
-            last_row = row
-            last_processed_file_name_buff.append(row.processed_file_name)
-        index_of_underscore = last_row.processed_file.find("_")
-        pre_last_processed_file_name = last_row.processed_file_name[:index_of_underscore]
-        list_number = []
-        for number in last_processed_file_name_buff:
-            list_number.append(int(number[index_of_underscore+1:]))
-        max_number = max(list_number)
-        last_processed_file_name = pre_last_processed_file_name + '_' + str(max_number)
+            index_of_underscore = row.processed_file_name.find("_")
+            number_after = row.processed_file_name[index_of_underscore+1:]
+            if number_after > number_max:
+                number_max = number_after
+                pre_last_processed_file_name = row.processed_file_name[:index_of_underscore]
+        last_processed_file_name = pre_last_processed_file_name + '_' + str(number_max)
         new_processed_number = max(total) + 1
         pre_actions_HE = max(total_he)
         pre_actions_CS = max(total_cs)
