@@ -15,15 +15,14 @@ from validation import validate, second_validation
 from flask_cors import CORS
 from histogram import get_histogram
 
-"""
-File name: server.py 
-Main: this is the server.py file to build the entire image 
-processing project. 
-Date: Dec 9th 2018 
-"""
+
+"""Main: this is the server.py file to build the entire 
+image processing project 
+Date: Dec 9th 2018 """
 
 app = Flask(__name__)
-engine = create_engine("postgresql://hw188:{0}@localhost:5432/bme590finalproject".format('123456'), max_overflow=20,
+engine = create_engine("postgresql://hw188:{0}@localhost:5432/bme590"
+                       "finalproject".format('123456'), max_overflow=20,
                        client_encoding='utf8')
 CORS(app)
 Session = sessionmaker(bind=engine)
@@ -51,13 +50,16 @@ class User(Base):
 
 class UploadFiles(Base):
     """
-    UploadFiles class initiate a upload_files instance to database table upload_files
+    UploadFiles class initiate a upload_files instance to database table
+    upload_files
     This class requires user to input:
-        index, upload_file, upload_file_name, upload_file_type, upload_time, image_size_original_row,
-        image_size_original_column, user_uuid, required_processing, file_identifier, original_color_image,
+        index, upload_file, upload_file_name, upload_file_type, upload_time,
+        image_size_original_row,image_size_original_column, user_uuid,
+        required_processing, file_identifier, original_color_image
 
     UploadFiles class is linked with User and ProcessedImage class.
-    Primary key is file_identifier, combination of uuid, file_name, and automatic generated index number.
+    Primary key is file_identifier, combination of uuid, file_name,
+    and automatic generated index number.
     This table also has a ForeignKey to reference back to user.uuid.
 
     """
@@ -72,11 +74,14 @@ class UploadFiles(Base):
     user_uuid = Column("user_uuid", UUID, ForeignKey("users.uuid"))
     require_processing = Column("require_processing", Boolean)
     file_identifier = Column("file_identifier", String, primary_key=True)
-    original_color_image = Column("original_color_image", LargeBinary, index=False)
-    processedImage = relationship("ProcessedImage", back_populates="uploadfiles")
+    original_color_image = Column("original_color_image", LargeBinary,
+                                  index=False)
+    processedImage = relationship("ProcessedImage",
+                                  back_populates="uploadfiles")
     user = relationship("User", back_populates="uploadFiles")
 
-    def __init__(self, upload_file, file_type, file_name, upload_time, uuid, index, image_size,
+    def __init__(self, upload_file, file_type, file_name, upload_time,
+                 uuid, index, image_size,
                  require_processing, file_identifier, original_color):
         self.upload_file = upload_file
         self.upload_file_type = file_type
@@ -93,13 +98,17 @@ class UploadFiles(Base):
 
 class ProcessedImage(Base):
     """
-    ProcessedImage class initiate a processed_image instance to store all processed images and their
+    ProcessedImage class initiate a processed_image instance to store all
+    processed images and their
     metrics including:
-        processing_type, processing_time, processed_file, processed_file_type, processed_number,
-        metrics, image_size_prcoessed_row, image_size_processed_column, num_HE, num_CS, num_LC, num_RV,
-        processed_file_name, uploadFiles_upload_file_name, upload_files_identifier, user_uuid_processed
-    Primary key of this table is processed_file_name, which is auto-generated base on previous processed_name
-    and corresponding upload_file_name
+        processing_type, processing_time, processed_file, processed_file_type,
+        processed_number,
+        metrics, image_size_prcoessed_row, image_size_processed_column, num_HE,
+        num_CS, num_LC, num_RV, processed_file_name,
+        uploadFiles_upload_file_name, upload_files_identifier,
+        user_uuid_processed
+    Primary key of this table is processed_file_name, which is auto-generated
+    base on previous processed_name and corresponding upload_file_name
     There are two ForeignKey of this table, users_uuid and upload_file_identifier
     """
     __tablename__ = "processed_image"
