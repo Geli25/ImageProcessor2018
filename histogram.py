@@ -5,6 +5,11 @@ import base64
 
 
 def is_grey(image_file):
+    """
+
+    :param image_file: The image file
+    :return: 1 if it is greyscale; Otherwise 0
+    """
     img = Image.open(image_file).convert('RGB')
     w, h = img.size
     try:
@@ -18,6 +23,12 @@ def is_grey(image_file):
 
 
 def get_histogram(origin_image, processed_image):
+    """
+
+    :param origin_image: The original encoded image file
+    :param processed_image: The processed encoded image file
+    :return: The histogram data list to send to the front end
+    """
     origin_image = base64.b64decode(origin_image)
     processed_image = base64.b64decode(processed_image)
     image_file = io.BytesIO(origin_image)
