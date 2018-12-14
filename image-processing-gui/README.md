@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 #### [Go to App hosted on FireBase](https://bmetester-484d1.firebaseapp.com/) ####
 
-## Running the web app locally: ##
+### Running the web app locally: ###
 
 1)Once cd'd into this folder in the Terminal, run: 
 <br>(You may need to install Node Package)
