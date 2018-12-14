@@ -1,0 +1,34 @@
+.eachGroup{
+    width:70%;
+    border-bottom:2px dotted grey;
+    padding-bottom:20px;
+}
+
+.imagePairs{
+    margin-top:5%;
+    margin-bottom:0.5%;
+}
+
+.pair{
+    display:inline-block;
+    padding-left:4.5%;
+    padding-right:4.5%;
+}
+
+.histogram{
+    margin-top:-40px;
+    display:inline-block;
+    width:290px;
+    height:250px;
+}
+
+.histograms h5{
+    margin-top:-10px;
+    padding-bottom:10px;
+    font-size:13px;
+}
+
+.refresh{
+    margin-bottom:20px;
+    cursor: pointer;;
+}

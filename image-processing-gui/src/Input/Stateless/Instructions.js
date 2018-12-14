@@ -9,9 +9,10 @@ const Instructions = (props) => {
                 <li><b>.png</b> files</li>
                 <li><b>.tiff</b> files</li>
                 <li><b>.zip</b> files<br />
-                    .zip files must contain images
+                    *.zip files must contain images of the above format*
                 </li>
            </ul>
+           <p><b>You can only upload 10 files at a total of 20mb per session.</b></p>
         </Fragment>
     );
 }

@@ -1,13 +1,18 @@
 import React from 'react';
-import NavItem from './NavItem';
-import './NavBarWrapper.css'
+import {
+    Navbar,
+    NavbarBrand,}from 'reactstrap';
+
+import NavItemB from './NavItem';
+import './NavBarWrapper.css';
 
 const NavBar = (props) => (
     <div>
-        <ul className="NavBar">
-            <NavItem link="/">Input</NavItem>
-            <NavItem link="/results">Output</NavItem>
-        </ul>
+        <Navbar color="light" light>
+            <NavbarBrand>Medical Image Processor</NavbarBrand>
+                <NavItemB link="/">Home</NavItemB>
+                <NavItemB link="/results">Output</NavItemB>
+        </Navbar>
         {props.children}
     </div>
 );
