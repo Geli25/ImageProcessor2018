@@ -16,3 +16,4 @@ sqlalchemy
 Pillow
 psycopg2
 flask-Cors
+pyopenssl
