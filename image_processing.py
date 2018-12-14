@@ -57,7 +57,8 @@ if __name__ == "__main__":
     image = image[:, :, 0]
     list_processing_method = ['GC']
     actions = [0, 0, 0, 0, 0]
-    output, actions, size = process_image(image, list_processing_method, actions)
+    output, actions, size = process_image(image, list_processing_method,
+                                          actions)
     plt.subplot(1, 2, 1)
     plt.imshow(image, interpolation='nearest', cmap='gray')
     plt.subplot(1, 2, 2)
