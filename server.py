@@ -14,6 +14,7 @@ from io import BytesIO
 from validation import validate, second_validation
 from flask_cors import CORS
 from histogram import get_histogram
+
 """
 File name: server.py 
 Main: this is the server.py file to build the entire image 
