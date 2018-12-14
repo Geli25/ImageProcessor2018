@@ -161,11 +161,11 @@ def validate(database):
                 # os.remove(dir_str)
             except OSError:
                 logging.error(file_name + " the uploaded file is broken\n")
-                data[7].append(file_name + " the uploaded file is broken")
+                data[7].append(file_name + " the uploaded file is broken\n")
             except Exception as e:
-                logging.error(file_name + " the uploaded file is broken" +
-                              e + "\n")
-                data[7].append(file_name + " the uploaded file is broken")
+                print(e)
+                logging.error(file_name + " the uploaded file is broken\n")
+                data[7].append(file_name + " the uploaded file is broken\n")
         else:
             try:
                 image_bytes = base64.b64decode(binary_image)
@@ -175,10 +175,10 @@ def validate(database):
                 add_name(data, file_name, 0)
             except OSError:
                 logging.error(file_name + " the uploaded file is broken\n")
-                data[7].append(file_name + " the uploaded file is broken")
+                data[7].append(file_name + " the uploaded file is broken\n")
             except Exception as e:
-                logging.error(file_name + " the uploaded file is broken" +
-                              e + "\n")
+                print(e)
+                logging.error(file_name + " the uploaded file is broken\n")
                 data[7].append(file_name + " the uploaded file is broken\n")
     for x in range(0, len(data[0])):
         data[3].append(x)
