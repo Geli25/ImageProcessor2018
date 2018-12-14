@@ -428,11 +428,12 @@ def add_new_processing_to_exist_user():
             total_gc.append(row.num_GC)
             index_of_underscore = row.processed_file_name.find("_")
             number_after = row.processed_file_name[index_of_underscore+1:]
+            print("number_after", number_after)
             if number_after > number_max:
                 number_max = number_after
                 pre_last_processed_file_name = row.processed_file_name[:index_of_underscore]
         last_processed_file_name = pre_last_processed_file_name + '_' + str(number_max)
-        print("last_processed_file_name", last_processed_file_name)
+        print("number_max", number_max)
         new_processed_number = max(total) + 1
         pre_actions_HE = max(total_he)
         pre_actions_CS = max(total_cs)
