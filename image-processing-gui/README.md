@@ -2,7 +2,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 # BME590Final ImageProcessing Frontend Folder #
 <br>
-#### Web App hosted FireBase:(https://bmetester-484d1.firebaseapp.com/) ####
+### [Web App hosted FireBase:](https://bmetester-484d1.firebaseapp.com/) ###
 
 ## Running the web app locally: ##
 
