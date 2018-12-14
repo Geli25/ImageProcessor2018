@@ -5,7 +5,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def process_image(image, list_processing_method, actions):
+def process_image(image, list_processing_method,
+                  actions):
     """
     Function process_image allows user to conduct the following
     image processing methods.
