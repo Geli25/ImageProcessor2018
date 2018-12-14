@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     Navbar,
-    NavbarBrand, Button}from 'reactstrap';
+    NavbarBrand}from 'reactstrap';
 
 import NavItemB from './NavItem';
 import './NavBarWrapper.css';

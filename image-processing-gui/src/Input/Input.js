@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import * as actionCreators from '../store/actions/userInfo';
-import * as actionCreator from '../store/actions/selectedFiles';
 import {Line} from 'rc-progress';
 import {Button} from 'reactstrap';
 import {Redirect,Prompt} from 'react-router-dom';
@@ -139,6 +138,16 @@ class Input extends Component {
         this.props.setLoading(true);
         this.setState({ loading: true });
         console.log(this.state.jsonData.uuid);
+
+        let arrangedFileNames=[];
+        for (let name of this.props.fileNames){
+            if (this.props.selectedFiles.includes(name)){
+                arrangedFileNames.push(name);
+            }
+        }
+        console.log(arrangedFileNames);
+
+
         // this.props.setLoading(true);
         let newData = {
             "uuid": this.props.uuid,

@@ -93,4 +93,4 @@ const mapDispatchtoProps=dispatch=>{
     }
 }
 
-export default withRouter(connect(null,mapDispatchtoProps)(App));
+export default withRouter(connect(mapStatetoProps,mapDispatchtoProps)(App));
