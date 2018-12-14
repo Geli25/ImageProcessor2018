@@ -211,8 +211,8 @@ class HandleNewUserRequest(object):
             self.image_size_processed.append(size)
             self.processed_file.append(encode_nparray_to_img
                                        (out_img, self.upload_file_type[index]))
+            self.actions = actions
         value = datetime.datetime.now() - self.upload_time
-        self.actions = actions
         self.processing_time = value.total_seconds()
 
 
@@ -373,7 +373,8 @@ def initial_new_image_processing():
         result = {"message": "Successfully added and processed user request",
                   "file_names": data[2]}
     else:
-        result = {data[7]}
+        result = {data[7][0]}
+        print("is validation error")
     session.close()
     return jsonify(result)
 
@@ -409,6 +410,7 @@ def add_new_processing_to_exist_user():
         pre_actions_RV = query_processedimage.num_RV
         pre_actions_LC = query_processedimage.num_LC
         pre_actions_GC = query_processedimage.num_GC
+        last_prcessed_file_name = row.processed_file_name
     else:
         total = []
         total_he = []
@@ -416,6 +418,7 @@ def add_new_processing_to_exist_user():
         total_rv = []
         total_lc = []
         total_gc = []
+        last_processed_file_name_buff = []
         for row in query_processedimage:
             total.append(row.processed_number)
             total_he.append(row.num_HE)
@@ -423,7 +426,15 @@ def add_new_processing_to_exist_user():
             total_rv.append(row.num_RV)
             total_lc.append(row.num_LC)
             total_gc.append(row.num_GC)
-            last_prcessed_file_name = row.processed_file_name
+            last_row = row
+            last_processed_file_name_buff.append(row.processed_file_name)
+        index_of_underscore = last_row.processed_file.find("_")
+        pre_last_processed_file_name = last_row.processed_file_name[:index_of_underscore]
+        list_number = []
+        for number in last_processed_file_name_buff:
+            list_number.append(int(number[index_of_underscore+1:]))
+        max_number = max(list_number)
+        last_processed_file_name = pre_last_processed_file_name + '_' + str(max_number)
         new_processed_number = max(total) + 1
         pre_actions_HE = max(total_he)
         pre_actions_CS = max(total_cs)
@@ -452,9 +463,10 @@ def add_new_processing_to_exist_user():
     for row in query_uploadfiles:
         for index, fn in enumerate(data[0]):
             if fn == row.upload_file_name:
-                processed_files_name = last_prcessed_file_name[:-1] + \
-                                       str(int(last_prcessed_file_name[-1]) +
-                                           index + 1)
+                print('last_prcessed_file_name', last_processed_file_name)
+                processed_files_name = last_processed_file_name[:-1] + \
+                    str(int(last_prcessed_file_name[-1]) + index + 1)
+                print('processed_files_name',processed_files_name)
                 file_id = old_upload_file_identifier[index]
                 processed_files = ProcessedImage(update_ur.processing_type,
                                                  update_ur.processing_time,
