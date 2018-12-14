@@ -220,7 +220,7 @@ class Output extends Component {
 
         return (
             <div>
-                <Prompt when={this.props.loading} message="Navigating to another page when data is not fully downloaded will
+                <Prompt when={this.state.loading} message="Navigating to another page when data is not fully downloaded will
                 cause  an error which resets the app. Do you want to proceed?" />
                 {this.props.sentStatus 
                     && !this.state.loading 
