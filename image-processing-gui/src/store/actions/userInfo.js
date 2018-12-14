@@ -52,3 +52,10 @@ export const toggleHistoDisplay=()=>{
         type:actionTypes.TOGGLE_HISTO_DISPLAY
     }
 }
+
+export const refreshedData=(bool)=>{
+    return{
+        type:actionTypes.REFRESHED_DATA,
+        refreshedData:bool
+    }
+}

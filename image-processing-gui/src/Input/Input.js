@@ -141,7 +141,7 @@ class Input extends Component {
             "GC":this.state.jsonData.GC,
             "selectedFilename": this.props.selectedFiles
         }
-        axios.post('http://vcm-7506.vm.duke.edu:5001/update_user_request', newData, {
+        axios.post('https://vcm-7506.vm.duke.edu:443/update_user_request', newData, {
             onUploadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
                 this.setState({percent:progressPercent},()=>{
@@ -155,6 +155,7 @@ class Input extends Component {
                 }
             }
         }).then(response => {
+            this.props.refreshedData(true);
             this.props.setLoading(false);
             this.setState({ loading: false, percent:0, color:"#FFA07A" }, () => {
                 console.log(newData, response);
@@ -170,7 +171,7 @@ class Input extends Component {
     else{
         this.props.setLoading(true);
         this.setState({loading:true});
-        axios.post('http://vcm-7506.vm.duke.edu:5001/new_user_request', this.state.jsonData, {
+        axios.post('https://vcm-7506.vm.duke.edu:443/new_user_request', this.state.jsonData, {
             onUploadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
                 this.setState({percent:progressPercent});
@@ -260,11 +261,11 @@ const mapStatetoProps=reduxState=>{
 const mapDispatchtoProps=dispatch=>{
     return{
         setLoading: (bool) => dispatch(actionCreators.setLoading(bool)),
+        refreshedData: (bool) => dispatch(actionCreators.refreshedData(bool)),
         sent: () => dispatch(actionCreators.sentTrue()),
         setRedirect: (bool) => dispatch(actionCreators.setRedirect(bool)),
         updateFileNames: (files) => dispatch(actionCreators.updateFileNames(files)),
         setReset: (bool) => dispatch(actionCreators.setReset(bool)),
-        gotData:(bool)=>dispatch(actionCreators.gotData(bool))
     }
 }
 

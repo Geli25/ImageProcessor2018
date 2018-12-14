@@ -31,7 +31,7 @@ class Output extends Component {
     }
 
     componentWillMount(){
-        if (this.props.sentStatus){
+        if (!this.props.hasData||this.props.refreshedData){
             console.log("initializing get data");
             this.retrieveData();
         }
@@ -78,7 +78,8 @@ class Output extends Component {
         }
         console.log(modifiedPairs);
         this.props.updateImagePairs(modifiedPairs)
-        .then(()=>this.setState({loading:false, gotData:true}));
+        .then(()=>this.setState({loading:false}));
+        this.props.gotData(true);
     }
 
     retrieveData=()=>{
@@ -103,7 +104,7 @@ class Output extends Component {
         //     }, 1000);
         // });
         this.setState({loading:true});
-        axios.get('http://vcm-7506.vm.duke.edu:5001/get_processed_result/' + this.props.uuid, {
+        axios.get('https://vcm-7506.vm.duke.edu:443/get_processed_result/' + this.props.uuid, {
             onDownloadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total) * 100;
                 this.setState({ percent: progressPercent }, () => {
@@ -128,6 +129,7 @@ class Output extends Component {
                     this.props.updateProcessingTime(response.data.processed_time);
                     this.processImages(response.data.img_pair, response.data.fileNames);
                     this.props.gotData(true);
+                    this.props.refreshData(false);
                 }
             }).catch(err=>{
                 console.log(err);
@@ -237,6 +239,7 @@ const mapStatetoProps=reduxState=>{
         sentStatus:reduxState.userInfo.sent,
         resetRedirect: reduxState.userInfo.resetRedirect,
         hasData:reduxState.userInfo.gotData,
+        refreshedData:reduxState.userInfo.refreshedData
     }
 }
 
@@ -252,7 +255,8 @@ const mapDispatchtoProps=dispatch=>{
         updateHistograms:(histograms)=>dispatch(actionCreator.updateHistograms(histograms)),
         clearReturnedData:()=>dispatch(actionCreator.clearReturnedData()),
         updateUploadTime:(time)=>dispatch(actionCreator.updateUploadTime(time)),
-        clearSelected:()=>dispatch(allActions.clearSelected)
+        clearSelected:()=>dispatch(allActions.clearSelected),
+        refreshData:(bool)=>dispatch(actionCreators.refreshedData(bool))
     }
 }
 
