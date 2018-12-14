@@ -464,7 +464,8 @@ def add_new_processing_to_exist_user():
     for row in query_uploadfiles:
         for index, fn in enumerate(data[0]):
             if fn == row.upload_file_name:
-                print('last_prcessed_file_name', last_processed_file_name)
+                print('fn', fn)
+                print("row.upload_file_name", row.upload_file_name)
                 processed_files_name = last_processed_file_name[:-1] + \
                     str(int(last_processed_file_name[-1]) + index + 1)
                 print('processed_files_name', processed_files_name)
