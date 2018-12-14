@@ -376,6 +376,7 @@ def initial_new_image_processing():
         result = {data[7][0]}
         print("is validation error")
     session.close()
+    print("Successfully added and processed user request files")
     return jsonify(result)
 
 
@@ -410,7 +411,7 @@ def add_new_processing_to_exist_user():
         pre_actions_RV = query_processedimage.num_RV
         pre_actions_LC = query_processedimage.num_LC
         pre_actions_GC = query_processedimage.num_GC
-        last_prcessed_file_name = row.processed_file_name
+        last_processed_file_name = row.processed_file_name
     else:
         total = []
         total_he = []
@@ -427,13 +428,13 @@ def add_new_processing_to_exist_user():
             total_lc.append(row.num_LC)
             total_gc.append(row.num_GC)
             index_of_underscore = row.processed_file_name.find("_")
-            number_after = row.processed_file_name[index_of_underscore+1:]
-            print("number_after", number_after)
+            number_after = int(row.processed_file_name[index_of_underscore+1:])
             if number_after > number_max:
                 number_max = number_after
-                pre_last_processed_file_name = row.processed_file_name[:index_of_underscore]
-        last_processed_file_name = pre_last_processed_file_name + '_' + str(number_max)
-        print("number_max", number_max)
+                pre_last_processed_file_name = \
+                    row.processed_file_name[:index_of_underscore]
+        last_processed_file_name = pre_last_processed_file_name + \
+            '_' + str(number_max)
         new_processed_number = max(total) + 1
         pre_actions_HE = max(total_he)
         pre_actions_CS = max(total_cs)
@@ -464,8 +465,8 @@ def add_new_processing_to_exist_user():
             if fn == row.upload_file_name:
                 print('last_prcessed_file_name', last_processed_file_name)
                 processed_files_name = last_processed_file_name[:-1] + \
-                    str(int(last_prcessed_file_name[-1]) + index + 1)
-                print('processed_files_name',processed_files_name)
+                    str(int(last_processed_file_name[-1]) + index + 1)
+                print('processed_files_name', processed_files_name)
                 file_id = old_upload_file_identifier[index]
                 processed_files = ProcessedImage(update_ur.processing_type,
                                                  update_ur.processing_time,
@@ -495,6 +496,7 @@ def add_new_processing_to_exist_user():
     session.commit()
     session.close()
     result = {"message": "Successfully updated and processed user request"}
+    print("Successfully updated and processed user request")
     return jsonify(result)
 
 
@@ -572,6 +574,7 @@ def get_processed_result(uuid):
                    out_processed_time[0],
                    upload_file_original, upload_time)
     session.close()
+    print("Successfully get user uuid {0}".format(uuid))
     return jsonify(output)
 
 
