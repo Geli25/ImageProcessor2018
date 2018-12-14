@@ -422,16 +422,18 @@ def add_new_processing_to_exist_user():
         print("processed_files_name",  processed_files_name)
         print("update_ur.actions", update_ur.actions)
         file_id = old_upload_file_identifier[index]
-        processed_files = ProcessedImage(update_ur.processing_type, update_ur.processing_time,
-                                         update_ur.processed_file[index], update_ur.upload_file_type[index],
-                                         update_ur.metrics[index], update_ur.actions[0]+pre_actions_HE,
-                                         update_ur.actions[1]+pre_actions_CS,
-                                         update_ur.actions[2]+pre_actions_LC, update_ur.actions[3]+pre_actions_RV,
-                                         update_ur.actions[4]+pre_actions_GC,
-                                         update_ur.upload_file_name[index],
-                                         update_ur.image_size_processed[index],
-                                         new_processed_number, processed_files_name, data[3], file_id)
-        session.add(processed_files)
+        for row in query_uploadfiles:
+            if row.upload_file_name == fn:
+                processed_files = ProcessedImage(update_ur.processing_type, update_ur.processing_time,
+                                            update_ur.processed_file[index], update_ur.upload_file_type[index],
+                                            update_ur.metrics[index], update_ur.actions[0]+pre_actions_HE,
+                                            update_ur.actions[1]+pre_actions_CS,
+                                            update_ur.actions[2]+pre_actions_LC, update_ur.actions[3]+pre_actions_RV,
+                                            update_ur.actions[4]+pre_actions_GC,
+                                            update_ur.upload_file_name[index],
+                                            update_ur.image_size_processed[index],
+                                            new_processed_number, processed_files_name, data[3], file_id)
+                session.add(processed_files)
     session.commit()
     session.close()
     result = {"message": "Successfully updated and processed user request"}
