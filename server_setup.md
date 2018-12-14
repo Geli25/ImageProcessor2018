@@ -48,8 +48,15 @@ _This document is for setting up the postgres database and server.py on vcm_
     pip install -r requirments.txt
     export TIMEOUT=3600
   
-  Build DATABASE AND START IT, Then run 
+  Down latest ssl-proxy 
   
-    gunicorn --bind 0.0.0.0:5001 server:app
+    wget -qO- https://github.com/suyashkumar/ssl-proxy/releases/download/v0.2.2/ssl-proxy-linux-amd64.tar.gz | tar xvz
+    sudo mv ssl-proxy-linux-amd64 /usr/local/bin/ssl-proxy
+    
+  Use screen to run proxy and server.py separately 
+  
+    sudo ssl-proxy -from 0.0.0.0:443 -to 127.0.0.1:5001 -domain $YOUR_VCM_DOMAIN_NAME_HERE
+  
+    gunicorn --bind 127.0.0.1:5001 server:app
 
 
