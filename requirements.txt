@@ -1,8 +1,5 @@
 numpy
 scipy
-pandas
-ipython
-jupyter
 matplotlib
 scikit-image
 scikit-learn
@@ -13,3 +10,11 @@ pytest-cov
 requests
 pyqt5
 Pillow
+flask
+gunicorn
+timestring
+sqlalchemy
+Pillow
+psycopg2
+flask-Cors
+pyopenssl
