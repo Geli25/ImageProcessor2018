@@ -50,6 +50,6 @@ _This document is for setting up the postgres database and server.py on vcm_
   
   Build DATABASE AND START IT, Then run 
   
-    gunicorn --bind 0.0.0.0:5000 server:app
+    gunicorn --bind 0.0.0.0:5001 server:app
 
 
