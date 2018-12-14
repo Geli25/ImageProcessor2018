@@ -47,3 +47,10 @@ export const clearReturnedData=()=>{
         type:actionTypes.CLEAR_RETURNED_DATA
     }
 }
+
+export const waitForProcessedImage=(pairs)=>dispatch=>{
+    return new Promise((resolve)=>{
+        dispatch(updateImagePairs(pairs));
+        resolve();
+    })
+}

@@ -1,10 +1,11 @@
-import React, { Component, Fragment} from 'react';
+import React, { Component, Fragment } from 'react';
 import {Redirect} from 'react-router-dom';
 import axios from 'axios';
 import {connect} from 'react-redux';
 
 import * as actionCreators from '../store/actions/userInfo';
 import * as actionCreator from '../store/actions/returnedData';
+import * as allActions from '../store/actions/selectedFiles'
 import './icono.min.css';
 import Loader from '../UI/Loader';
 import {Badge} from 'reactstrap';
@@ -37,12 +38,23 @@ class Output extends Component {
         this.props.setRedirect(false);
     }
 
+    resetApp = () => {
+        const uuidv4 = require('uuid/v4');
+        let newUuid = uuidv4();
+        this.props.resetApp(newUuid);
+        this.props.clearSelected();
+        console.log(newUuid);
+    }
+
     processImages=(imagePairs,fileNames)=>{
         let modifiedPairs=[];
         let fileTypes=["jpeg","tiff","png"];
         for (let pair of imagePairs){
             let index=imagePairs.indexOf(pair);
             let type = fileNames[index].substr(fileNames[index].indexOf('.')+1);
+            if (type==="TIF"){
+                type="tiff"
+            }
             console.log(fileNames[index]);
             let modifiedPair = [];
 
@@ -64,7 +76,8 @@ class Output extends Component {
             modifiedPairs.push(modifiedPair);
         }
         console.log(modifiedPairs);
-        this.props.updateImagePairs(modifiedPairs);
+        this.props.updateImagePairs(modifiedPairs)
+        .then(()=>this.setState({loading:false, gotData:true}));
     }
 
     retrieveData=()=>{
@@ -88,25 +101,24 @@ class Output extends Component {
         //         this.props.gotData(true);
         //     }, 1000);
         // });
-        axios.get('http://vcm-7506.vm.duke.edu:5003/get_processed_result/'+this.props.uuid)
+        this.setState({loading:true});
+        axios.get('http://vcm-7506.vm.duke.edu:5000/get_processed_result/'+this.props.uuid)
             .then(response=>{
                 console.log(response);
                 if (response.data.uuid===this.props.uuid){
                     this.props.clearReturnedData();
                     console.log(response.data.img_pair, response.data.fileNames);
                     this.props.updateImageNames(response.data.fileNames);
+                    this.props.updateHistograms(response.data.histogram_pair);
                     this.props.updateImageSizes(response.data.img_size);
+                    this.props.updateUploadTime(response.data.upload_time);
                     this.props.updateProcessingTime(response.data.processed_time);
                     this.processImages(response.data.img_pair, response.data.fileNames);
-                    this.props.updateHistograms(response.data.histogram_pair);
-                    this.setState({ loading: false }, () => {
-                        this.props.gotData(true);
-                    });
                 }
-            })
-            .catch(err=>{
+            }).catch(err=>{
                 console.log(err);
                 alert("Error:"+err);
+                this.resetApp();
             })
     }
 
@@ -217,12 +229,14 @@ const mapDispatchtoProps=dispatch=>{
         setRedirect:(bool)=>dispatch(actionCreators.setRedirect(bool)),
         gotData:(bool)=>dispatch(actionCreators.gotData(bool)),
         resetApp:(uuid)=>dispatch(actionCreators.resetApp(uuid)),
-        updateImagePairs:(pairs)=>dispatch(actionCreator.updateImagePairs(pairs)),
+        updateImagePairs:(pairs)=>dispatch(actionCreator.waitForProcessedImage(pairs)),
         updateImageSizes: (sizes) => dispatch(actionCreator.updateImageSizes(sizes)),
         updateProcessingTime:(time)=>dispatch(actionCreator.updateProcessingTime(time)),
         updateImageNames:(names)=>dispatch(actionCreator.updateImageNames(names)),
         updateHistograms:(histograms)=>dispatch(actionCreator.updateHistograms(histograms)),
-        clearReturnedData:()=>dispatch(actionCreator.clearReturnedData())
+        clearReturnedData:()=>dispatch(actionCreator.clearReturnedData()),
+        updateUploadTime:(time)=>dispatch(actionCreator.updateUploadTime(time)),
+        clearSelected:()=>dispatch(allActions.clearSelected)
     }
 }
 

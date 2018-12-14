@@ -5,7 +5,7 @@ const SelectImages = props =>(
         <input 
             type="file"  
             onChange={props.updateFile}
-            accept=".jpg, .jpeg, .zip, .png, .tiff"
+            accept=".jpg, .jpeg, .zip, .png, .tif, .tiff"
             multiple />
         <br />
     </Fragment>

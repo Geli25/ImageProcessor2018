@@ -31,6 +31,13 @@ const Options = props => {
                 name="RV"
                 onChange={()=>props.toggle("RV")} />
             <label htmlFor="RV">Reverse Video</label>
+
+            <input
+                type="checkbox"
+                checked={props.optionData.GC}
+                name="GC"
+                onChange={() => props.toggle("GC")} />
+            <label htmlFor="GC">Gamma Correction</label>
             <br />
             <br />
         </div>

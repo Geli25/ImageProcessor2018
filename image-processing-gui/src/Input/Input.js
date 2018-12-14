@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import axios from 'axios';
 import * as actionCreators from '../store/actions/userInfo';
 import Loader from './../UI/Loader';
+import {Line} from 'rc-progress';
 import {Button} from 'reactstrap';
 import {Redirect} from 'react-router-dom';
 import Welcome from './Stateless/Welcome';
@@ -15,12 +16,15 @@ class Input extends Component {
 
     state = {
         loading:false,
+        percent:0,
+        color:"#FFA07A",
         jsonData:{
             "files":[],
             "HE":true,
             "CS":false,
             "LC":false,
             "RV":false,
+            "GC":false,
             "uuid":null,
             "fileNames": [],
         }
@@ -90,6 +94,12 @@ class Input extends Component {
         })
     }
 
+    // sortFileNames=()=>{
+    //     for (let name of this.props.fileNames){
+    //         if (name in )
+    //     }
+    // }
+
     submitButton=()=>{
     //    **this is a fake simulation to test out functionality**
     //     if (this.props.sentStatus===true){
@@ -131,35 +141,50 @@ class Input extends Component {
             "RV": this.state.jsonData.RV,
             "selectedFilename": this.props.selectedFiles
         }
-        axios.post('http://vcm-7506.vm.duke.edu:5003/update_user_request', newData, {
+        axios.post('http://vcm-7506.vm.duke.edu:5000/update_user_request', newData, {
             onUploadProgress: progressEvent => {
-                let progressPercent = (progressEvent.loaded / progressEvent.total);
-                console.log(progressPercent);
+                let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
+                this.setState({percent:progressPercent},()=>{
+                    console.log(progressPercent);
+                });
+                if (progressPercent > 30) {
+                    this.setState({ color: "#33A1FF" });
+                }
+                if (progressPercent > 70) {
+                    this.setState({ color: "#4BCE97" });
+                }
             }
         }).then(response => {
             this.props.setLoading(false);
-            this.setState({ loading: false }, () => {
+            this.setState({ loading: false, color:"#FFA07A" }, () => {
                 console.log(newData, response);
             });
             this.props.setRedirect(true);
         }).catch(err => {
             console.log(newData);
             this.props.setLoading(false);
-            this.setState({ loading: false });
+            this.setState({ loading: false, color:"#FFA07A" });
             alert("Something went wrong, please try again. Error: " + err);
         })
     }
     else{
         this.props.setLoading(true);
         this.setState({loading:true});
-        axios.post('http://vcm-7506.vm.duke.edu:5003/new_user_request', this.state.jsonData, {
+        axios.post('http://vcm-7506.vm.duke.edu:5000/new_user_request', this.state.jsonData, {
             onUploadProgress: progressEvent => {
-                let progressPercent = (progressEvent.loaded / progressEvent.total);
+                let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
+                this.setState({percent:progressPercent});
+                if (progressPercent>30){
+                    this.setState({ color:"#33A1FF"});
+                }
+                if (progressPercent>70){
+                    this.setState({ color:"	#4BCE97"});
+                }
                 console.log(progressPercent);
             }
         }).then(response => {
             this.props.updateFileNames(response.data.file_names);
-            this.setState({loading: false})
+            this.setState({ loading: false, color:"#FFA07A" });
             this.props.sent();
             this.props.setLoading(false);
             console.log(this.state.jsonData, response.data.file_names);
@@ -167,7 +192,7 @@ class Input extends Component {
         }).catch(err => {
             this.props.setLoading(false);
             console.log(this.state);
-            this.setState({loading:false});
+            this.setState({ loading: false, color:"#FFA07A" });
             alert("Something went wrong, please try again. Error: " + err);
         })
     }
@@ -203,10 +228,11 @@ class Input extends Component {
                 : <SelectImages
                     updateFile={this.fileUpdate} />}
                 <Options 
-
                     toggle={this.optionToggle}
                     optionData={this.state.jsonData} />
-                {this.state.loading ? <Loader /> : <Button color="success" disabled={disable} onClick={this.submitButton}>Submit</Button>}
+                {this.state.loading 
+                    ? <Line strokeWidth="1" strokeColor={this.state.color} percent={this.state.percent} width="50%" />
+                    : <Button color="success" disabled={disable} onClick={this.submitButton}>Submit</Button>}
             </Fragment>
         );
         if (this.props.redirectActive) {

@@ -17,8 +17,8 @@ const ProcessedImages=props=>{
             console.log(name);
             let fileName = name.substr(0, name.indexOf('.'));
             let size = props.imageSizes[index];
-            // let histogram=props.histograms[index];
-            let formats=[".jpeg",".tiff",".png"];
+            let histogram=props.histograms[index];
+            let formats=[".jpeg",".tif",".png"];
 
             for (let type of pair[1]){
                 let typeIndex=pair[1].indexOf(type);
@@ -29,7 +29,7 @@ const ProcessedImages=props=>{
                 if (formats[typeIndex]===".png"){
                     props.zip(b64,fileName+formats[typeIndex],"png");
                 }
-                if (formats[typeIndex]===".tiff"){
+                if (formats[typeIndex]===".tif"){
                     props.zip(b64,fileName+formats[typeIndex],"tiff");
                 }
             }
@@ -40,7 +40,7 @@ const ProcessedImages=props=>{
                         ? null
                         : <Fragment>
                             <ImagePairs pair={pair} size={size} />
-                            {/* {props.histoDisplay ? <HistogramGroup histogram={histogram} /> : null} */}
+                            {props.histoDisplay ? <HistogramGroup histogram={histogram} /> : null}
                             <EachDropDownButton pair={pair} name={name} download={props.download} />
                         </Fragment>}
                 </div >

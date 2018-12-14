@@ -28,7 +28,7 @@ class EachDropDownButton extends Component {
                         <DropdownItem divider />
                         <DropdownItem onClick={()=>this.props.dlall("jpeg")}>.jpeg files</DropdownItem>
                         <DropdownItem onClick={()=>this.props.dlall("png")}>.png files</DropdownItem>
-                        <DropdownItem onClick={()=>this.props.dlall("tiff")}>.tiff files</DropdownItem>
+                        <DropdownItem onClick={()=>this.props.dlall("tiff")}>.tif files</DropdownItem>
                     </DropdownMenu>
                 </ButtonDropdown>
             </div>
