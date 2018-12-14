@@ -11,6 +11,11 @@ all_type = ["JPEG", "JPG", "TIFF", "PNG", "TIF"]
 
 
 def un_zip(file_name):
+    """
+
+    :param file_name: The zip file
+    :return: The directory after unzipping
+    """
     zip_file = zipfile.ZipFile(file_name)
     dir_name = os.path.splitext(file_name)[0] + "_files"
     if os.path.exists(dir_name):
@@ -25,6 +30,13 @@ def un_zip(file_name):
 
 
 def image_turn_grey(image_file, image_type):
+    """
+
+    :param image_file: File to be turned grey,
+     which can be encoded image or image file
+    :param image_type: File type
+    :return: Encoded greyscale image file
+    """
     if type(image_file) == bytes:
         image_file = io.BytesIO(image_file)
     img = Image.open(image_file)
@@ -37,6 +49,12 @@ def image_turn_grey(image_file, image_type):
 
 
 def origin_image(image_file):
+    """
+
+    :param image_file: The original image file,
+     which can be encoded image or image file
+    :return: The encoded original image file
+    """
     if type(image_file) == bytes:
         return base64.b64encode(image_file)
     with open(image_file, "rb") as image_file:
@@ -44,6 +62,13 @@ def origin_image(image_file):
 
 
 def traverse_dir(path, my_data, name):
+    """
+
+    :param path: Current path
+    :param my_data: The data set
+    :param name: File name
+    :return: The upgraded data set after traversing the whole directory
+    """
     files = os.listdir(path)
     for file in files:
         in_file = os.path.join(path, file)
@@ -68,6 +93,13 @@ def traverse_dir(path, my_data, name):
 
 
 def add_name(access, file_name, i):
+    """
+    :synopsis: Add name to the data set without the duplicated names
+    :param access: The data set
+    :param file_name: The name of the file to be added
+    :param i: The ordered number
+    :return: Appended data set
+    """
     try:
         access[2].index(file_name)
         if i == 0:
@@ -85,6 +117,21 @@ def add_name(access, file_name, i):
 
 
 def validate(database):
+    """
+    :synopsis: Validate the input from the frond end and
+    translate it into the data set to be processed
+    :param database: The data uploaded by the frontend
+    :return: A validated data set, which is a list of list.
+    :data[0]: list of greyscale encoded image file
+    :data[1]: list of image file types
+    :data[2]: list of image file names
+    :data[3]: list of image file indexes
+    :data[4]: list of processing types
+    :data[5]: upload time
+    :data[6]: uuid
+    :data[7]: list of Errors messages
+    :data[8]: list of original encoded image files
+    """
     update_time = dt.datetime.now()
     data = [[], [], [], [], [], update_time, database["uuid"], [], []]
     if database["CS"]:
@@ -139,6 +186,16 @@ def validate(database):
 
 
 def second_validation(new_database):
+    """
+    :synopsis: Validate the updated input from the frond end and
+    translate it into the data set to be processed
+    :param new_database: The updated data from the front end
+    :return: A validated data set, which is a list of list.
+    :new_data[0]: list of Selected File Names
+    :new_data[1]: list of processing types
+    :new_data[2]: upload time
+    :new_data[3]: uuid
+    """
     update_time = dt.datetime.now()
     new_data = [[], [], update_time, new_database["uuid"]]
     if new_database["CS"]:
