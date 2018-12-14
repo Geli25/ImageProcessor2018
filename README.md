@@ -18,7 +18,6 @@ the processed image._
 _Files Required to run server.py_ 
 
 
-
 **1.2 Instruction To Use**
 
     1.2.1 Database and VCM deployment 
