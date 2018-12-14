@@ -537,10 +537,12 @@ def get_processed_result(uuid):
             info_uploadfiles.image_size_original_column])
     else:
         for row in q:
-            out_processed_file.append(row.processed_file)
-            out_processed_image_size.append([row.image_size_processed_row,
-                                             row.image_size_processed_column])
-            out_processed_time.append(float(row.processing_time))
+            for upload_fn in info_uploadfiles:
+                if upload_fn.upload_file_name == row.uploadFiles_upload_file_name:
+                    out_processed_file.append(row.processed_file)
+                    out_processed_image_size.append([row.image_size_processed_row,
+                                                    row.image_size_processed_column])
+                    out_processed_time.append(float(row.processing_time))
         for row in info_uploadfiles:
             out_original_image_size.append([row.image_size_original_row,
                                             row.image_size_original_column])
