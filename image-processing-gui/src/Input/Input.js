@@ -129,6 +129,7 @@ class Input extends Component {
     //     }
     // }
     if (this.props.sentStatus===true){
+        this.props.setLoading(true);
         this.setState({ loading: true });
         console.log(this.state.jsonData.uuid);
         // this.props.setLoading(true);

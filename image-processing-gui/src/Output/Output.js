@@ -2,14 +2,15 @@ import React, { Component, Fragment } from 'react';
 import {Redirect} from 'react-router-dom';
 import axios from 'axios';
 import {connect} from 'react-redux';
+import { Circle } from 'rc-progress';
+import { Badge } from 'reactstrap';
 
 import * as actionCreators from '../store/actions/userInfo';
 import * as actionCreator from '../store/actions/returnedData';
-import * as allActions from '../store/actions/selectedFiles'
+import * as allActions from '../store/actions/selectedFiles';
+import '../App.css';
 import './icono.min.css';
-import {Circle} from 'rc-progress';
 
-import {Badge} from 'reactstrap';
 import Results from './Stateless/Results';
 
 import FileSaver from 'file-saver';
@@ -31,15 +32,28 @@ class Output extends Component {
     }
 
     componentWillMount(){
-        if (!this.props.hasData||this.props.refreshedData){
+        if ((this.props.sentStatus&&!this.props.hasData)||this.props.refreshedData){
             console.log("initializing get data");
             this.retrieveData();
+            if (this.props.refreshedData){
+                this.props.refreshData(false);
+            }
         }
     }
 
     componentDidMount(){
         this.props.setRedirect(false);
     }
+
+
+
+    componentWillUnmount(){
+        if (this.state.loading){
+            alert("Please do NOT navigate to another page while loading. Resetting...")
+            this.resetApp();
+        }
+    }
+
 
     resetApp = () => {
         const uuidv4 = require('uuid/v4');
