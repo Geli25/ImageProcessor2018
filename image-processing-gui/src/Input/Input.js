@@ -156,7 +156,7 @@ class Input extends Component {
             "LC": this.state.jsonData.LC,
             "RV": this.state.jsonData.RV,
             "GC":this.state.jsonData.GC,
-            "selectedFilename": this.props.selectedFiles
+            "selectedFilename": arrangedFileNames
         }
         axios.post('https://vcm-7506.vm.duke.edu:443/update_user_request', newData, {
             onUploadProgress: progressEvent => {
