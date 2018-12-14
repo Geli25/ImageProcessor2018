@@ -539,6 +539,7 @@ def get_processed_result(uuid):
         for row in q:
             for upload_fn in info_uploadfiles:
                 if row.uploadFiles_upload_file_name == upload_fn.upload_file_name:
+                    print("row.uploadFiles_upload_file_name", row.uploadFiles_upload_file_name)
                     out_processed_file.append(row.processed_file)
                     out_processed_image_size.append([row.image_size_processed_row,
                                                     row.image_size_processed_column])
@@ -552,7 +553,7 @@ def get_processed_result(uuid):
     upload_file_original = []
     for o in info_uploadfiles:
         for b in q:
-            if o.upload_file_name == b.uploadFiles_upload_file_name:
+            if b.uploadFiles_upload_file_name == o.upload_file_name :
                 upload_file_type.append(o.upload_file_type)
                 upload_file_name.append(o.upload_file_name)
                 upload_file.append(o.upload_file)
