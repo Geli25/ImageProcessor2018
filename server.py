@@ -372,6 +372,7 @@ def initial_new_image_processing():
     if not data[7]:
         result = {"message": "Successfully added and processed user request",
                   "file_names": data[2]}
+        print("file_name", data[2])
     else:
         result = {data[7][0]}
         print("is validation error")
