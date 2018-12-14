@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import * as actionCreators from '../store/actions/userInfo';
-import Loader from './../UI/Loader';
 import {Line} from 'rc-progress';
 import {Button} from 'reactstrap';
 import {Redirect} from 'react-router-dom';
@@ -139,9 +138,10 @@ class Input extends Component {
             "CS": this.state.jsonData.CS,
             "LC": this.state.jsonData.LC,
             "RV": this.state.jsonData.RV,
+            "GC":this.state.jsonData.GC,
             "selectedFilename": this.props.selectedFiles
         }
-        axios.post('http://vcm-7506.vm.duke.edu:5000/update_user_request', newData, {
+        axios.post('http://vcm-7506.vm.duke.edu:5001/update_user_request', newData, {
             onUploadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
                 this.setState({percent:progressPercent},()=>{
@@ -156,21 +156,21 @@ class Input extends Component {
             }
         }).then(response => {
             this.props.setLoading(false);
-            this.setState({ loading: false, color:"#FFA07A" }, () => {
+            this.setState({ loading: false, percent:0, color:"#FFA07A" }, () => {
                 console.log(newData, response);
             });
             this.props.setRedirect(true);
         }).catch(err => {
             console.log(newData);
             this.props.setLoading(false);
-            this.setState({ loading: false, color:"#FFA07A" });
+            this.setState({ loading: false, percent:0, color:"#FFA07A" });
             alert("Something went wrong, please try again. Error: " + err);
         })
     }
     else{
         this.props.setLoading(true);
         this.setState({loading:true});
-        axios.post('http://vcm-7506.vm.duke.edu:5000/new_user_request', this.state.jsonData, {
+        axios.post('http://vcm-7506.vm.duke.edu:5001/new_user_request', this.state.jsonData, {
             onUploadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
                 this.setState({percent:progressPercent});
@@ -184,7 +184,7 @@ class Input extends Component {
             }
         }).then(response => {
             this.props.updateFileNames(response.data.file_names);
-            this.setState({ loading: false, color:"#FFA07A" });
+            this.setState({ loading: false, percent:0, color:"#FFA07A" });
             this.props.sent();
             this.props.setLoading(false);
             console.log(this.state.jsonData, response.data.file_names);
@@ -192,7 +192,7 @@ class Input extends Component {
         }).catch(err => {
             this.props.setLoading(false);
             console.log(this.state);
-            this.setState({ loading: false, color:"#FFA07A" });
+            this.setState({ loading: false, percent:0, color:"#FFA07A" });
             alert("Something went wrong, please try again. Error: " + err);
         })
     }

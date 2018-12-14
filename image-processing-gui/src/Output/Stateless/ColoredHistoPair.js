@@ -3,7 +3,6 @@ import { BarSeries, XAxis, YAxis } from '@data-ui/histogram';
 import ResponsiveHistogram from './ResponsiveHisto';
 
 const ColoredHistoPair = props => {
-    console.log(props.histogram);
     return (
         <div className="histograms">
             <div className="histogram">

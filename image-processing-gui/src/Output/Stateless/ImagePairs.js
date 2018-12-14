@@ -2,7 +2,6 @@ import React from 'react';
 import './ProcessedImages.css';
 
 const ImagePairs = props => {
-    console.log(props.pair[1]);
     return (
         <div className="imagePairs">
             <div className="pair">

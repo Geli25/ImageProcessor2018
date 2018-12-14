@@ -11,10 +11,6 @@ const ProcessedImages=props=>{
         props.imagePairs.map(pair=>{
             let index = props.imagePairs.indexOf(pair);
             let name = props.imageNames[index];
-            console.log(index);
-            console.log(pair);
-            console.log(props.imageNames);
-            console.log(name);
             let fileName = name.substr(0, name.indexOf('.'));
             let size = props.imageSizes[index];
             let histogram=props.histograms[index];

@@ -7,7 +7,8 @@ import * as actionCreators from '../store/actions/userInfo';
 import * as actionCreator from '../store/actions/returnedData';
 import * as allActions from '../store/actions/selectedFiles'
 import './icono.min.css';
-import Loader from '../UI/Loader';
+import {Circle} from 'rc-progress';
+
 import {Badge} from 'reactstrap';
 import Results from './Stateless/Results';
 
@@ -20,7 +21,9 @@ let zipT = new JSZip();
 
 class Output extends Component {
     state={
-        loading:false
+        loading:false,
+        percent:0,
+        color:"#FFA07A"
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -55,7 +58,6 @@ class Output extends Component {
             if (type==="TIF"){
                 type="tiff"
             }
-            console.log(fileNames[index]);
             let modifiedPair = [];
 
             // Attaching the first image
@@ -67,7 +69,6 @@ class Output extends Component {
             let i = 0;
             for (let types of pair[1]){
                 let formattype=fileTypes[i];
-                console.log(formattype);
                 let img64Types = "data:image/"+formattype+";base64," + types
                 i+=1;
                 modTypes.push(img64Types);
@@ -102,8 +103,20 @@ class Output extends Component {
         //     }, 1000);
         // });
         this.setState({loading:true});
-        axios.get('http://vcm-7506.vm.duke.edu:5000/get_processed_result/'+this.props.uuid)
-            .then(response=>{
+        axios.get('http://vcm-7506.vm.duke.edu:5001/get_processed_result/' + this.props.uuid, {
+            onDownloadProgress: progressEvent => {
+                let progressPercent = (progressEvent.loaded / progressEvent.total) * 100;
+                this.setState({ percent: progressPercent }, () => {
+                    console.log(progressPercent);
+                });
+                if (progressPercent > 30) {
+                    this.setState({ color: "#33A1FF" });
+                }
+                if (progressPercent > 70) {
+                    this.setState({ color: "#4BCE97" });
+                }
+            }
+        }).then(response=>{
                 console.log(response);
                 if (response.data.uuid===this.props.uuid){
                     this.props.clearReturnedData();
@@ -114,10 +127,12 @@ class Output extends Component {
                     this.props.updateUploadTime(response.data.upload_time);
                     this.props.updateProcessingTime(response.data.processed_time);
                     this.processImages(response.data.img_pair, response.data.fileNames);
+                    this.props.gotData(true);
                 }
             }).catch(err=>{
                 console.log(err);
                 alert("Error:"+err);
+                this.setState({ loading: false, percent: 0, color:"#FFA07A"})
                 this.resetApp();
             })
     }
@@ -167,28 +182,29 @@ class Output extends Component {
 
 
     render() {
-        let content = (
-            <Fragment>
-            <br />
-            <h4>Upload files from the "Input" page to begin</h4>
-            </Fragment>
-        )
+        let content = null;
         if (this.props.sentStatus&&this.state.loading){
             content=(
                 <Fragment>
                     <br />
                     <h4>Getting your data...</h4>
                     <p><b>Please do not navigate to another page</b></p>
-                    <Loader />
+                    <Circle trailWidth="2.5" strokeWidth="2.5" strokeColor={this.state.color} percent={this.state.percent} width="20%" />
                 </Fragment>
             );
         }
-        else if (this.props.sentStatus && !this.state.loading && this.props.hasData){
-            content=null;
+        else if (!this.props.hasData){
+            content = (
+                <Fragment>
+                    <br />
+                    <h4>Upload files from the "Input" page to begin</h4>
+                </Fragment>
+            );
         }
         if (this.props.resetRedirect){
             content=<Redirect to="/" />
         }
+
         return (
             <div>
                 {this.props.sentStatus 
@@ -202,7 +218,7 @@ class Output extends Component {
                     &&!this.state.loading 
                     ? <Fragment>
                         <br />
-                        <Badge className="refresh" color="dark" href="" onClick={this.retrieveData}>Click icon to refresh results</Badge>
+                        <Badge className="refresh" color="dark" href="" onClick={this.retrieveData}>REFRESH</Badge>
                         <Results
                             zipFiles={this.zipFiles}
                             downloadAll={this.downloadAll}
