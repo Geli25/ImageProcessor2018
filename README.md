@@ -18,11 +18,38 @@ the processed image._
 _Files Required to run server.py_ 
 
 
+`bme590final` 
+    
+      |___server.py
+ 
+      |___image_processing.py 
+      
+      |___test_image_processing.py 
+  
+      |___server_setup.md
+
+      |___validation.py
+ 
+      |___test_validation.py 
+  
+      |___histogram.py 
+      
+      |___test_histogram.py  
+      
+      |___image_processing_gui (REACT)     
+      
+      |___.travis.yml
+      
+      |___README.md
+      
+      |___requirement.txt
+
+
 **1.2 Instruction To Use**
 
     1.2.1 Database and VCM deployment 
         
         Please refer to server_setup.md for this part 
         
-    1.2.2 REACT 
+    1.2.2 REACT user interface
     
