@@ -6,11 +6,13 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Running the web app locally: ##
 
-1)Once cd'd into this folder in the Terminal, run (You may need to install Node Package):
+1)Once cd'd into this folder in the Terminal, run: 
+<br>(You may need to install Node Package)
 
 #### `npm install`
 
-2)In Input>Input.js & Output>Output.js, find & replace, do not modified anything outside of <>
+2)In Input>Input.js & Output>Output.js, find & replace. 
+<br>**Do not modified anything outside of '<>'**
 
 #### `axios.post/get("<link to your local server>",...)`
 
