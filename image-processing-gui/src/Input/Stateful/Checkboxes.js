@@ -35,7 +35,7 @@ class Checkboxes extends Component {
                     <input
                         className="checkbox"
                         id="all"
-                        disabled={checked}
+                        disabled={checked || this.props.masterloading}
                         checked={checked}
                         onChange={this.selectAllToggle}
                         type="checkbox"
@@ -51,6 +51,7 @@ class Checkboxes extends Component {
 const mapStatetoProps=reduxState=>{
     return{
         filenames: reduxState.userInfo.fileNames,
+        masterloading:reduxState.userInfo.loading
     }
 }
 

@@ -9,7 +9,8 @@ const initialState={
     histoDisplay:false,
     resetRedirect:false,
     fileNames:[],
-    uuid:null
+    uuid:null,
+    refreshedData:false
 }
 
 const reducer=(curState=initialState,action)=>{
@@ -23,7 +24,8 @@ const reducer=(curState=initialState,action)=>{
                 fileNames:[],
                 resetRedirect:true,
                 gotData:false,
-                histoDisplay:false
+                histoDisplay:false,
+                refreshedData: false
             })
         case actionTypes.SET_LOADING:
             return stateUpdater(curState,{
@@ -35,7 +37,7 @@ const reducer=(curState=initialState,action)=>{
             })
         case actionTypes.SET_REDIRECT:
             return stateUpdater(curState,{
-                redirect:action.redirect
+                redirectActive:action.redirect
             })
         case actionTypes.UPDATE_FILENAMES:{
             return stateUpdater(curState,{
@@ -44,7 +46,7 @@ const reducer=(curState=initialState,action)=>{
         }
         case actionTypes.SET_RESET:{
             return stateUpdater(curState,{
-                resetRedirect:false
+                resetRedirect:action.redirect
             })
         }
         case actionTypes.GOT_DATA:{
@@ -55,6 +57,11 @@ const reducer=(curState=initialState,action)=>{
         case actionTypes.TOGGLE_HISTO_DISPLAY:{
             return stateUpdater(curState,{
                 histoDisplay:!curState.histoDisplay
+            })
+        }
+        case actionTypes.REFRESHED_DATA:{
+            return stateUpdater(curState,{
+                refreshedData: action.refreshedData
             })
         }
         default:

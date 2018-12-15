@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as actionCreators from '../store/actions/userInfo';
 import {Line} from 'rc-progress';
 import {Button} from 'reactstrap';
-import {Redirect} from 'react-router-dom';
+import {Redirect,Prompt} from 'react-router-dom';
 import Welcome from './Stateless/Welcome';
 import Instructions from './Stateless/Instructions';
 import SelectImages from './Stateless/SelectImages';
@@ -44,6 +44,12 @@ class Input extends Component {
                 }
         });
         this.props.setReset();
+    }
+
+    componentWillUnmount(){
+        if (this.state.loading){
+            window.location.reload();
+        }
     }
     
     optionToggle=(option)=>{
@@ -129,8 +135,19 @@ class Input extends Component {
     //     }
     // }
     if (this.props.sentStatus===true){
+        this.props.setLoading(true);
         this.setState({ loading: true });
         console.log(this.state.jsonData.uuid);
+
+        let arrangedFileNames=[];
+        for (let name of this.props.fileNames){
+            if (this.props.selectedFiles.includes(name)){
+                arrangedFileNames.push(name);
+            }
+        }
+        console.log(arrangedFileNames);
+
+
         // this.props.setLoading(true);
         let newData = {
             "uuid": this.props.uuid,
@@ -139,9 +156,9 @@ class Input extends Component {
             "LC": this.state.jsonData.LC,
             "RV": this.state.jsonData.RV,
             "GC":this.state.jsonData.GC,
-            "selectedFilename": this.props.selectedFiles
+            "selectedFilename": arrangedFileNames
         }
-        axios.post('http://vcm-7506.vm.duke.edu:5001/update_user_request', newData, {
+        axios.post('https://vcm-7506.vm.duke.edu:443/update_user_request', newData, {
             onUploadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
                 this.setState({percent:progressPercent},()=>{
@@ -155,6 +172,7 @@ class Input extends Component {
                 }
             }
         }).then(response => {
+            this.props.refreshedData(true);
             this.props.setLoading(false);
             this.setState({ loading: false, percent:0, color:"#FFA07A" }, () => {
                 console.log(newData, response);
@@ -170,7 +188,7 @@ class Input extends Component {
     else{
         this.props.setLoading(true);
         this.setState({loading:true});
-        axios.post('http://vcm-7506.vm.duke.edu:5001/new_user_request', this.state.jsonData, {
+        axios.post('https://vcm-7506.vm.duke.edu:443/new_user_request', this.state.jsonData, {
             onUploadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total)*100;
                 this.setState({percent:progressPercent});
@@ -207,7 +225,8 @@ class Input extends Component {
                 || (!this.state.jsonData["HE"] 
                 && !this.state.jsonData["CS"] 
                 && !this.state.jsonData["RV"]
-                && !this.state.jsonData["LC"])){
+                && !this.state.jsonData["LC"]
+                && !this.state.jsonData["GC"])){
                 disable=true;
             }
         }
@@ -215,13 +234,16 @@ class Input extends Component {
             if (this.props.selectedFiles.length === 0 || ((!this.state.jsonData["HE"]
                 && !this.state.jsonData["CS"]
                 && !this.state.jsonData["RV"]
-                && !this.state.jsonData["LC"]))){
+                && !this.state.jsonData["LC"]
+                && !this.state.jsonData["GC"]))){
                 disable=true
             }
         }
 
         let content = (
             <Fragment>
+                <Prompt when={this.props.masterloading} message="Navigating to another page when data is not fully downloaded
+                 will cause an error which resets the app. Do you want to proceed?" />
                 <Welcome />
                 <Instructions />
                 {this.props.sentStatus ? <Instruction2 /> 
@@ -251,20 +273,21 @@ const mapStatetoProps=reduxState=>{
     return{
         uuid: reduxState.userInfo.uuid,
         sentStatus:reduxState.userInfo.sent,
-        redirectActive:reduxState.userInfo.redirect,
+        redirectActive:reduxState.userInfo.redirectActive,
         fileNames:reduxState.userInfo.fileNames,
-        selectedFiles:reduxState.selectedfiles.selectedFiles
+        selectedFiles:reduxState.selectedfiles.selectedFiles,
+        masterloading:reduxState.userInfo.loading
     }
 }
 
 const mapDispatchtoProps=dispatch=>{
     return{
         setLoading: (bool) => dispatch(actionCreators.setLoading(bool)),
+        refreshedData: (bool) => dispatch(actionCreators.refreshedData(bool)),
         sent: () => dispatch(actionCreators.sentTrue()),
         setRedirect: (bool) => dispatch(actionCreators.setRedirect(bool)),
         updateFileNames: (files) => dispatch(actionCreators.updateFileNames(files)),
-        setReset: (bool) => dispatch(actionCreators.setReset(bool)),
-        gotData:(bool)=>dispatch(actionCreators.gotData(bool))
+        setReset: (bool) => dispatch(actionCreators.setReset(bool))
     }
 }
 

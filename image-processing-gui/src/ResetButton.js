@@ -5,7 +5,7 @@ import {Button} from 'reactstrap';
 const ResetButton = props => (
     <Button
         color="danger"
-        disabled={props.masterLoading}
+        disabled={props.masterloading}
         onClick={props.reset}>Reset session</Button>
 );
 

@@ -37,7 +37,7 @@ class NamesofImages extends Component{
                             type="checkbox"
                             id={name}
                             checked={checked}
-                            disabled={checked}
+                            disabled={checked||this.props.masterloading}
                             onChange={this.checkboxHandler} />
                         <label htmlFor="HE">{name}</label>
                     </li>
@@ -49,7 +49,8 @@ class NamesofImages extends Component{
 
 const mapStatetoProps=reduxState=>{
     return{
-        allNames:reduxState.userInfo.fileNames
+        allNames:reduxState.userInfo.fileNames,
+        masterloading:reduxState.userInfo.loading
     }
 }
 

@@ -22,12 +22,10 @@ class App extends Component {
     }
 
     resetApp=()=>{
-        const uuidv4 = require('uuid/v4');
-        let newUuid = uuidv4();
-        this.props.resetApp(newUuid);
+        this.props.resetApp();
         this.props.clearSelected();
-        this.setState({ uuid: newUuid })
-        console.log(newUuid);
+        this.setState({ uuid: this.props.uuid  })
+        console.log(this.props.uuid);
         if (this.state.uuid !== null) {
             alert("Session reset successful!");
         }
@@ -82,6 +80,12 @@ class App extends Component {
     }
 }
 
+const mapStatetoProps=reduxState=>{
+    return{
+        uuid:reduxState.userInfo.uuid
+    }
+}
+
 const mapDispatchtoProps=dispatch=>{
     return{
         resetApp:(uuid)=>dispatch(actionCreators.resetApp(uuid)),
@@ -89,4 +93,4 @@ const mapDispatchtoProps=dispatch=>{
     }
 }
 
-export default withRouter(connect(null,mapDispatchtoProps)(App));
+export default withRouter(connect(mapStatetoProps,mapDispatchtoProps)(App));

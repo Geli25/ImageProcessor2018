@@ -1,23 +1,24 @@
 import React, { Component, Fragment } from 'react';
-import {Redirect} from 'react-router-dom';
+import {Redirect, Prompt} from 'react-router-dom';
 import axios from 'axios';
 import {connect} from 'react-redux';
+import { Circle } from 'rc-progress';
+import { Badge } from 'reactstrap';
 
 import * as actionCreators from '../store/actions/userInfo';
 import * as actionCreator from '../store/actions/returnedData';
-import * as allActions from '../store/actions/selectedFiles'
+import * as allActions from '../store/actions/selectedFiles';
+import '../App.css';
 import './icono.min.css';
-import {Circle} from 'rc-progress';
 
-import {Badge} from 'reactstrap';
 import Results from './Stateless/Results';
 
 import FileSaver from 'file-saver';
 import JSZip from 'jszip';
 
-let zipJ = new JSZip();
-let zipP = new JSZip();
-let zipT = new JSZip();
+let zipJ;
+let zipP;
+let zipT;
 
 class Output extends Component {
     state={
@@ -31,9 +32,12 @@ class Output extends Component {
     }
 
     componentWillMount(){
-        if (this.props.sentStatus){
+        if ((this.props.sentStatus&&!this.props.hasData)||this.props.refreshedData){
             console.log("initializing get data");
             this.retrieveData();
+            if (this.props.refreshedData){
+                this.props.refreshData(false);
+            }
         }
     }
 
@@ -41,12 +45,18 @@ class Output extends Component {
         this.props.setRedirect(false);
     }
 
+
+    componentWillUnmount(){
+        if (this.state.loading){
+            window.location.reload();
+        }
+    }
+
+
     resetApp = () => {
-        const uuidv4 = require('uuid/v4');
-        let newUuid = uuidv4();
-        this.props.resetApp(newUuid);
+        this.props.resetApp();
         this.props.clearSelected();
-        console.log(newUuid);
+        console.log(this.props.uuid);
     }
 
     processImages=(imagePairs,fileNames)=>{
@@ -78,7 +88,8 @@ class Output extends Component {
         }
         console.log(modifiedPairs);
         this.props.updateImagePairs(modifiedPairs)
-        .then(()=>this.setState({loading:false, gotData:true}));
+        .then(()=>this.setState({loading:false}));
+        this.props.gotData(true);
     }
 
     retrieveData=()=>{
@@ -103,7 +114,7 @@ class Output extends Component {
         //     }, 1000);
         // });
         this.setState({loading:true});
-        axios.get('http://vcm-7506.vm.duke.edu:5001/get_processed_result/' + this.props.uuid, {
+        axios.get('https://vcm-7506.vm.duke.edu:443/get_processed_result/' + this.props.uuid, {
             onDownloadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total) * 100;
                 this.setState({ percent: progressPercent }, () => {
@@ -128,6 +139,8 @@ class Output extends Component {
                     this.props.updateProcessingTime(response.data.processed_time);
                     this.processImages(response.data.img_pair, response.data.fileNames);
                     this.props.gotData(true);
+                    this.props.refreshData(false);
+                    this.setState({ loading: false, percent: 0, color:"#FFA07A"})
                 }
             }).catch(err=>{
                 console.log(err);
@@ -146,12 +159,15 @@ class Output extends Component {
 
     zipFiles = (img64, name, type) => {
         if (type === "jpeg") {
+            zipJ=new JSZip();
             zipJ.file("processed_" + name, img64, { base64: true });
         }
         if (type === "png") {
+            zipP=new JSZip();
             zipP.file("processed_" + name, img64, { base64: true })
         }
         if (type === "tiff") {
+            zipT=new JSZip;
             zipT.file("processed_" + name, img64, { base64: true })
         }
     }
@@ -207,6 +223,8 @@ class Output extends Component {
 
         return (
             <div>
+                <Prompt when={this.state.loading} message="Navigating to another page when data is not fully downloaded will
+                cause  an error which resets the app. Do you want to proceed?" />
                 {this.props.sentStatus 
                     && !this.state.loading 
                     ? <Fragment>
@@ -237,6 +255,8 @@ const mapStatetoProps=reduxState=>{
         sentStatus:reduxState.userInfo.sent,
         resetRedirect: reduxState.userInfo.resetRedirect,
         hasData:reduxState.userInfo.gotData,
+        refreshedData:reduxState.userInfo.refreshedData,
+        masterloading:reduxState.userInfo.loading
     }
 }
 
@@ -244,7 +264,7 @@ const mapDispatchtoProps=dispatch=>{
     return{
         setRedirect:(bool)=>dispatch(actionCreators.setRedirect(bool)),
         gotData:(bool)=>dispatch(actionCreators.gotData(bool)),
-        resetApp:(uuid)=>dispatch(actionCreators.resetApp(uuid)),
+        resetApp:()=>dispatch(actionCreators.resetApp()),
         updateImagePairs:(pairs)=>dispatch(actionCreator.waitForProcessedImage(pairs)),
         updateImageSizes: (sizes) => dispatch(actionCreator.updateImageSizes(sizes)),
         updateProcessingTime:(time)=>dispatch(actionCreator.updateProcessingTime(time)),
@@ -252,7 +272,8 @@ const mapDispatchtoProps=dispatch=>{
         updateHistograms:(histograms)=>dispatch(actionCreator.updateHistograms(histograms)),
         clearReturnedData:()=>dispatch(actionCreator.clearReturnedData()),
         updateUploadTime:(time)=>dispatch(actionCreator.updateUploadTime(time)),
-        clearSelected:()=>dispatch(allActions.clearSelected)
+        clearSelected:()=>dispatch(allActions.clearSelected),
+        refreshData:(bool)=>dispatch(actionCreators.refreshedData(bool))
     }
 }
 
