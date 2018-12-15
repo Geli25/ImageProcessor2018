@@ -433,6 +433,8 @@ def add_new_processing_to_exist_user():
             total_gc.append(row.num_GC)
             index_of_underscore = row.processed_file_name.rfind("_")
             number_after = int(row.processed_file_name[index_of_underscore+1:])
+            pre_last_processed_file_name = \
+                row.processed_file_name[:index_of_underscore]
             if number_after > number_max:
                 number_max = number_after
                 pre_last_processed_file_name = \
