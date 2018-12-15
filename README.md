@@ -72,8 +72,7 @@ _Files Required to run server.py_
         
     1.3.2 REACT user interface
         
-  [Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine] 
-        (https://github.com/Geli25/bme590final/tree/master/image-processing-gui)
+  [Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine](https://github.com/Geli25/bme590final/tree/master/image-processing-gui)
         
 
 **1.4 Individual Contribution and Break down**
