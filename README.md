@@ -59,7 +59,7 @@ _Files Required to run server.py_
       
       |___test_resource 
 
-**1.2 Demo Video 
+**1.2 Demo Video** 
 
 ![](20181214222212.gif)
 
