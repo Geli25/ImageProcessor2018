@@ -61,7 +61,7 @@ _Files Required to run server.py_
 
 **1.2 Demo Video** 
 
-![](20181214222212.gif)
+[![](20181214222212.gif)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE)
 
 ### Link to demo video: https://www.youtube.com/watch?v=37om1fB5FFc&feature=youtu.be
 
