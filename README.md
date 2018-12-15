@@ -3,7 +3,7 @@
 ##### Author: Steven Hua, Angelina Liu, Haitong Tina Wang 
 ##### Date: December 13, 2018 
 
-[![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)
+[![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ----
 
@@ -68,7 +68,7 @@ _Files Required to run server.py_
 
     1.3.1 Database and VCM deployment 
         
-[Please refer to server_setup.md for detailed instruction on how to deploy on local machine](https://github.com/Geli25/bme590final/blob/master/server_setup.md)
+        [Please refer to server_setup.md for detailed instruction on how to deploy on local machine](https://github.com/Geli25/bme590final/blob/master/server_setup.md)
         
     1.3.2 REACT user interface
         
