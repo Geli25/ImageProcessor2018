@@ -58,31 +58,36 @@ _Files Required to run server.py_
       |___test_histogram
       
       |___test_resource 
-      
 
-**1.2 Instruction To Use**
+**1.2 Demo Video 
 
-    1.2.1 Database and VCM deployment 
+![](20181214222212.gif)
+
+### Link to demo video: https://www.youtube.com/watch?v=37om1fB5FFc&feature=youtu.be
+
+**1.3 Instruction To Use**
+
+    1.3.1 Database and VCM deployment 
         
         Please refer to server_setup.md for detailed instruction on how to deploy on local machine 
         
-    1.2.2 REACT user interface
+    1.3.2 REACT user interface
         
         Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine 
 
-**1.3 Individual Contribution and Break down**
+**1.4 Individual Contribution and Break down**
 
-    1.3.1 Angelina Liu 
+    1.4.1 Angelina Liu 
     
           - all front end (react.js)
           
-    1.3.2 Tina Haitong Wang 
+    1.4.2 Tina Haitong Wang 
     
           - server
           - image processing
           - database 
           
-    1.3.3 Steven Hua 
+    1.4.3 Steven Hua 
         
           - valdiation 
           - histogram 
