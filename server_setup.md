@@ -46,7 +46,7 @@ _This document is for setting up the postgres database and server.py on vcm_
     virtualenv -p python3 env 
     source env/bin/activate
     pip install -r requirments.txt
-    export TIMEOUT=3600
+    export TIMEOUT = 1800
   
   Down latest ssl-proxy 
   
