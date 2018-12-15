@@ -26,4 +26,13 @@ Runs the app in the development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 
+## How it works: ###
+
+Every user can only upload images ONCE per session, but can reprocess their already uploaded files as many times as they want. Once they choose to reset the session, they will not be able to find their processed files in their previous session. 
+
+To prevent server overload the file sizes should be limited to the specified size. Users can only upload 10 files at a time (can be all .zip files). 
+
+Most of the instructions are explained. If the user navigates to another page while the either page is loading (when the progress bar is showing), a warning will pop up. Should the user chooses to proceed, the entire app will be reset, and the user will be in a new session. 
+
+
 
