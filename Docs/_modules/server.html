@@ -1,0 +1,683 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="python">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>server &#8212; MedicalImageProcessor 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for server</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">LargeBinary</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> \
+    <span class="n">Integer</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">,</span> <span class="n">Boolean</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.dialects.postgresql</span> <span class="k">import</span> <span class="n">UUID</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="k">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="k">import</span> <span class="n">sessionmaker</span><span class="p">,</span> <span class="n">relationship</span>
+<span class="kn">from</span> <span class="nn">image_processing</span> <span class="k">import</span> <span class="n">process_image</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">matimage</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">validation</span> <span class="k">import</span> <span class="n">validate</span><span class="p">,</span> <span class="n">second_validation</span>
+<span class="kn">from</span> <span class="nn">flask_cors</span> <span class="k">import</span> <span class="n">CORS</span>
+<span class="kn">from</span> <span class="nn">histogram</span> <span class="k">import</span> <span class="n">get_histogram</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timezone</span>
+
+<span class="sd">&quot;&quot;&quot;Main: this is the server.py file to build the entire</span>
+<span class="sd">image processing project</span>
+<span class="sd">Author: Haitong Wang</span>
+<span class="sd">Date: Dec 9th 2018 &quot;&quot;&quot;</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s2">&quot;postgresql://hw188:</span><span class="si">{0}</span><span class="s2">@localhost:5432/bme590&quot;</span>
+                       <span class="s2">&quot;finalproject&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;123456&#39;</span><span class="p">),</span> <span class="n">max_overflow</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                       <span class="n">client_encoding</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+<span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    User class initiate an user request instance to</span>
+<span class="sd">    store data:</span>
+<span class="sd">        uuid, file, file type, file name, processing type,</span>
+<span class="sd">        processing time, upload time, image size, actions,</span>
+<span class="sd">        metrics</span>
+<span class="sd">    User is linked with UploadFiles and ProcessedImage class.</span>
+<span class="sd">    Primary key is uuid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;users&quot;</span>
+    <span class="n">uuid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">UUID</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">uploadFiles</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;UploadFiles&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+    <span class="n">processedImage</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;ProcessedImage&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span>
+
+
+<span class="k">class</span> <span class="nc">UploadFiles</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    UploadFiles class initiate a upload_files instance to database table</span>
+<span class="sd">    upload_files</span>
+<span class="sd">    This class requires user to input:</span>
+<span class="sd">        index, upload_file, upload_file_name, upload_file_type, upload_time,</span>
+<span class="sd">        image_size_original_row,image_size_original_column, user_uuid,</span>
+<span class="sd">        required_processing, file_identifier, original_color_image</span>
+
+<span class="sd">    UploadFiles class is linked with User and ProcessedImage class.</span>
+<span class="sd">    Primary key is file_identifier, combination of uuid, file_name,</span>
+<span class="sd">    and automatic generated index number.</span>
+<span class="sd">    This table also has a ForeignKey to reference back to user.uuid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;upload_files&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">upload_file</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;upload_file&quot;</span><span class="p">,</span> <span class="n">LargeBinary</span><span class="p">)</span>
+    <span class="n">upload_file_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;upload_file_name&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+    <span class="n">upload_file_type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;upload_file_type&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+    <span class="n">upload_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;upload_time&quot;</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">)</span>
+    <span class="n">image_size_original_row</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;image_size_original_row&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">image_size_original_column</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;image_size_original_column&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">user_uuid</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;user_uuid&quot;</span><span class="p">,</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;users.uuid&quot;</span><span class="p">))</span>
+    <span class="n">require_processing</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;require_processing&quot;</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">)</span>
+    <span class="n">file_identifier</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;file_identifier&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">original_color_image</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;original_color_image&quot;</span><span class="p">,</span> <span class="n">LargeBinary</span><span class="p">,</span>
+                                  <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">processedImage</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;ProcessedImage&quot;</span><span class="p">,</span>
+                                  <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;uploadfiles&quot;</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;uploadFiles&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">upload_file</span><span class="p">,</span> <span class="n">file_type</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">upload_time</span><span class="p">,</span>
+                 <span class="n">uuid</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span>
+                 <span class="n">require_processing</span><span class="p">,</span> <span class="n">file_identifier</span><span class="p">,</span> <span class="n">original_color</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_file</span> <span class="o">=</span> <span class="n">upload_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_file_type</span> <span class="o">=</span> <span class="n">file_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size_original_row</span> <span class="o">=</span> <span class="n">image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size_original_column</span> <span class="o">=</span> <span class="n">image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_time</span> <span class="o">=</span> <span class="n">upload_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_uuid</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">require_processing</span> <span class="o">=</span> <span class="n">require_processing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_identifier</span> <span class="o">=</span> <span class="n">file_identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_color_image</span> <span class="o">=</span> <span class="n">original_color</span>
+
+
+<span class="k">class</span> <span class="nc">ProcessedImage</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ProcessedImage class initiate a processed_image instance to store all</span>
+<span class="sd">    processed images and their</span>
+<span class="sd">    metrics including:</span>
+<span class="sd">        processing_type, processing_time, processed_file, processed_file_type,</span>
+<span class="sd">        processed_number,</span>
+<span class="sd">        metrics, image_size_prcoessed_row, image_size_processed_column, num_HE,</span>
+<span class="sd">        num_CS, num_LC, num_RV, processed_file_name,</span>
+<span class="sd">        uploadFiles_upload_file_name, upload_files_identifier,</span>
+<span class="sd">        user_uuid_processed</span>
+<span class="sd">    Primary key of this table is processed_file_name, which is auto-generated</span>
+<span class="sd">    base on previous processed_name and corresponding upload_file_name</span>
+<span class="sd">    There are two ForeignKey of this table, users_uuid and</span>
+<span class="sd">    upload_file_identifier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;processed_image&quot;</span>
+    <span class="n">processing_type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;image_processing_type&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+    <span class="n">processing_time</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;processing_time&quot;</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">)</span>
+    <span class="n">processed_file</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;processed_file&quot;</span><span class="p">,</span> <span class="n">LargeBinary</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">processed_file_type</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;processed_file_type&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+    <span class="n">processed_number</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;processed_number&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;processing_metrics&quot;</span><span class="p">,</span> <span class="n">Numeric</span><span class="p">)</span>
+    <span class="n">image_size_processed_row</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;image_size_original_row&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">image_size_processed_column</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;image_size_original_column&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">num_HE</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;number_of_histogram_equalization&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">num_CS</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;number_of_contrast_stretching&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">num_LC</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;number_of_log_compression&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">num_RV</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;number_of_reverse_video&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">num_GC</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;number_of_gemma_correction&quot;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span>
+    <span class="n">processed_file_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;processed_file_name&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span>
+                                 <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">uploadFiles_upload_file_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;uploadFiles_upload_file_name&quot;</span><span class="p">,</span>
+                                          <span class="n">String</span><span class="p">)</span>
+    <span class="n">uploadFiles_file_identifier</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;uploadFiles_file_identifier&quot;</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span>
+                                         <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;upload_files.&quot;</span>
+                                                    <span class="s2">&quot;file_identifier&quot;</span><span class="p">))</span>
+    <span class="n">user_uuid_processed</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="s2">&quot;user_uuid_processed&quot;</span><span class="p">,</span> <span class="n">UUID</span><span class="p">,</span>
+                                 <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;users.uuid&quot;</span><span class="p">))</span>
+    <span class="n">uploadfiles</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;UploadFiles&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;processedImage&quot;</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;processedImage&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processing_type</span><span class="p">,</span> <span class="n">processing_time</span><span class="p">,</span> <span class="n">processed_file</span><span class="p">,</span>
+                 <span class="n">processed_file_type</span><span class="p">,</span>
+                 <span class="n">processing_latency</span><span class="p">,</span> <span class="n">num_HE</span><span class="p">,</span> <span class="n">num_CS</span><span class="p">,</span> <span class="n">num_LC</span><span class="p">,</span> <span class="n">num_RV</span><span class="p">,</span>
+                 <span class="n">num_GC</span><span class="p">,</span> <span class="n">upload_file_name</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span>
+                 <span class="n">processed_number</span><span class="p">,</span> <span class="n">processed_file_name</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span>
+                 <span class="n">uploadFiles_file_identifier</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_type</span> <span class="o">=</span> <span class="n">processing_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_file_type</span> <span class="o">=</span> <span class="n">processed_file_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_time</span> <span class="o">=</span> <span class="n">processing_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_file</span> <span class="o">=</span> <span class="n">processed_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size_processed_row</span> <span class="o">=</span> <span class="n">image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size_processed_column</span> <span class="o">=</span> <span class="n">image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">processing_latency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_HE</span> <span class="o">=</span> <span class="n">num_HE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_CS</span> <span class="o">=</span> <span class="n">num_CS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_LC</span> <span class="o">=</span> <span class="n">num_LC</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_RV</span> <span class="o">=</span> <span class="n">num_RV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_GC</span> <span class="o">=</span> <span class="n">num_GC</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uploadFiles_upload_file_name</span> <span class="o">=</span> <span class="n">upload_file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_number</span> <span class="o">=</span> <span class="n">processed_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_file_name</span> <span class="o">=</span> <span class="n">processed_file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_uuid_processed</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uploadFiles_file_identifier</span> <span class="o">=</span> <span class="n">uploadFiles_file_identifier</span>
+
+
+<span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">HandleNewUserRequest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    this class functions as a handle to process user request,</span>
+<span class="sd">    for each new request, including new user and update, will</span>
+<span class="sd">    initiate an instance of this class</span>
+<span class="sd">    to handle processing task</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">upload_file</span><span class="p">,</span> <span class="n">processing_type</span><span class="p">,</span> <span class="n">upload_time</span><span class="p">,</span>
+                 <span class="n">file_type</span><span class="p">,</span>
+                 <span class="n">processed_file_index</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_file</span> <span class="o">=</span> <span class="n">upload_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_file_type</span> <span class="o">=</span> <span class="n">file_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_file_index</span> <span class="o">=</span> <span class="n">processed_file_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upload_time</span> <span class="o">=</span> <span class="n">upload_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_type</span> <span class="o">=</span> <span class="n">processing_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_file</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size_original</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size_processed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># processing latency</span>
+
+    <span class="k">def</span> <span class="nf">image_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        image_processing function process the image according</span>
+<span class="sd">        user&#39;s request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processed_file_index</span><span class="p">:</span>
+            <span class="n">time_be</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="n">current_img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_file</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">decode_img</span> <span class="o">=</span> <span class="n">decode_b64_image</span><span class="p">(</span><span class="n">current_img</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_size_original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decode_img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">out_img</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">process_image</span><span class="p">(</span><span class="n">decode_img</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">processing_type</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
+            <span class="n">time_af</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time_af</span> <span class="o">-</span> <span class="n">time_be</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_size_processed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processed_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encode_nparray_to_img</span>
+                                       <span class="p">(</span><span class="n">out_img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="n">actions</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_time</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="encode_nparray_to_img"><a class="viewcode-back" href="../index.html#server.encode_nparray_to_img">[docs]</a><span class="k">def</span> <span class="nf">encode_nparray_to_img</span><span class="p">(</span><span class="n">np_array</span><span class="p">,</span> <span class="n">img_format</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    encode_nparray_to_img functions encodes the np_array processed</span>
+<span class="sd">    img to a base64 for front end</span>
+<span class="sd">    :param np_array: array of processed image</span>
+<span class="sd">    :param img_format: image type, jpg, png, tiff</span>
+<span class="sd">    :return: base64 encoded bytes string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># image = Image.fromarray(np_array)</span>
+    <span class="c1"># buffer = BytesIO()</span>
+    <span class="c1"># im2 = image.convert(&quot;L&quot;)</span>
+    <span class="c1"># ft = &#39;JPEG&#39; if img_format == &#39;jpg&#39; or &#39;JPG&#39; else img_format</span>
+    <span class="c1"># im2.save(buffer, format=ft)</span>
+    <span class="c1"># output = base64.b64encode(buffer.getvalue())</span>
+
+    <span class="k">with</span> <span class="n">BytesIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">out_bytes</span><span class="p">:</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np_array</span><span class="p">)</span>
+        <span class="n">im2</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">)</span>
+        <span class="n">ft</span> <span class="o">=</span> <span class="s1">&#39;JPEG&#39;</span> <span class="k">if</span> <span class="n">img_format</span> <span class="o">==</span> <span class="s1">&#39;jpg&#39;</span> <span class="ow">or</span> <span class="s1">&#39;JPG&#39;</span> <span class="k">else</span> <span class="n">img_format</span>
+        <span class="n">im2</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_bytes</span><span class="p">,</span> <span class="n">ft</span><span class="p">)</span>
+        <span class="n">byte_data</span> <span class="o">=</span> <span class="n">out_bytes</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">byte_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="decode_b64_image"><a class="viewcode-back" href="../index.html#server.decode_b64_image">[docs]</a><span class="k">def</span> <span class="nf">decode_b64_image</span><span class="p">(</span><span class="n">base64_string</span><span class="p">,</span> <span class="n">img_format</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    decode_b64_image decode bytes string into a np array of</span>
+<span class="sd">    img</span>
+<span class="sd">    :param base64_string: bytes string</span>
+<span class="sd">    :param img_format: image type, jpg, png, tiff</span>
+<span class="sd">    :return: decoded image in np array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image_bytes</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">base64_string</span><span class="p">)</span>
+    <span class="n">image_buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">image_bytes</span><span class="p">)</span>
+    <span class="n">ft</span> <span class="o">=</span> <span class="s1">&#39;JPEG&#39;</span> <span class="k">if</span> <span class="n">img_format</span> <span class="o">==</span> <span class="s1">&#39;jpg&#39;</span> <span class="ow">or</span> <span class="s1">&#39;JPG&#39;</span> <span class="k">else</span> <span class="n">img_format</span>
+    <span class="n">decoded_img</span> <span class="o">=</span> <span class="n">matimage</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">image_buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ft</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">decoded_img</span></div>
+
+
+<div class="viewcode-block" id="to_ui"><a class="viewcode-back" href="../index.html#server.to_ui">[docs]</a><span class="k">def</span> <span class="nf">to_ui</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">processed_file</span><span class="p">,</span> <span class="n">upload_file_type</span><span class="p">,</span> <span class="n">upload_file_name</span><span class="p">,</span>
+          <span class="n">upload_file</span><span class="p">,</span> <span class="n">image_size_original</span><span class="p">,</span> <span class="n">image_size_processed</span><span class="p">,</span>
+          <span class="n">processing_time</span><span class="p">,</span> <span class="n">original_file</span><span class="p">,</span> <span class="n">upload_time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    to_ui method generates return information</span>
+<span class="sd">    to the front end</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">img_pair</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">his_pair</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">img_size_pair</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">upload_file</span><span class="p">):</span>
+        <span class="n">decode</span> <span class="o">=</span> <span class="n">decode_b64_image</span><span class="p">(</span><span class="n">processed_file</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                  <span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="n">decode_his</span> <span class="o">=</span> <span class="n">get_histogram</span><span class="p">(</span><span class="n">original_file</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">processed_file</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="n">his_pair</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decode_his</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;JPEG&quot;</span> <span class="ow">or</span> <span class="s2">&quot;JPG&quot;</span><span class="p">:</span>
+            <span class="n">format1</span> <span class="o">=</span> <span class="n">encode_nparray_to_img</span><span class="p">(</span><span class="n">decode</span><span class="p">,</span> <span class="s2">&quot;PNG&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">format2</span> <span class="o">=</span> <span class="n">encode_nparray_to_img</span><span class="p">(</span><span class="n">decode</span><span class="p">,</span> <span class="s2">&quot;TIFF&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">img_pair</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">original_file</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                             <span class="p">[</span><span class="n">processed_file</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                              <span class="n">format2</span><span class="p">,</span> <span class="n">format1</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PNG&quot;</span><span class="p">:</span>
+            <span class="n">format1</span> <span class="o">=</span> <span class="n">encode_nparray_to_img</span><span class="p">(</span><span class="n">decode</span><span class="p">,</span> <span class="s2">&quot;JPEG&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">format2</span> <span class="o">=</span> <span class="n">encode_nparray_to_img</span><span class="p">(</span><span class="n">decode</span><span class="p">,</span> <span class="s2">&quot;TIFF&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">img_pair</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">original_file</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                             <span class="p">[</span><span class="n">format1</span><span class="p">,</span> <span class="n">format2</span><span class="p">,</span>
+                              <span class="n">processed_file</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">format1</span> <span class="o">=</span> <span class="n">encode_nparray_to_img</span><span class="p">(</span><span class="n">decode</span><span class="p">,</span> <span class="s2">&quot;PNG&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">format2</span> <span class="o">=</span> <span class="n">encode_nparray_to_img</span><span class="p">(</span><span class="n">decode</span><span class="p">,</span> <span class="s2">&quot;JPEG&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">img_pair</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">original_file</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                             <span class="p">[</span><span class="n">format2</span><span class="p">,</span> <span class="n">processed_file</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)],</span>
+                             <span class="n">format1</span><span class="p">])</span>
+        <span class="n">img_size_pair</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">image_size_original</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                              <span class="n">image_size_processed</span><span class="p">[</span><span class="n">index</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="n">uuid</span><span class="p">,</span>
+            <span class="s2">&quot;img_pair&quot;</span><span class="p">:</span> <span class="n">img_pair</span><span class="p">,</span>
+            <span class="s2">&quot;histogram_pair&quot;</span><span class="p">:</span> <span class="n">his_pair</span><span class="p">,</span>
+            <span class="s2">&quot;img_size&quot;</span><span class="p">:</span> <span class="n">img_size_pair</span><span class="p">,</span>
+            <span class="s2">&quot;processed_time&quot;</span><span class="p">:</span> <span class="n">processing_time</span><span class="p">,</span>
+            <span class="s2">&quot;fileNames&quot;</span><span class="p">:</span> <span class="n">upload_file_name</span><span class="p">,</span>
+            <span class="s2">&quot;upload_time&quot;</span><span class="p">:</span> <span class="n">upload_time</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ValidationError"><a class="viewcode-back" href="../index.html#server.ValidationError">[docs]</a><span class="k">class</span> <span class="nc">ValidationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ValidationError class generate validation error messages</span>
+<span class="sd">    to output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="initial_new_image_processing"><a class="viewcode-back" href="../index.html#server.initial_new_image_processing">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/new_user_request&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">initial_new_image_processing</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    /new_user_request allows to post a new user request</span>
+<span class="sd">    :return: error if any error, or successfully add the new user request</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user_uuid_list</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user_uuid_list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">uuid</span> <span class="ow">in</span> <span class="n">user_uuid_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uuid</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">uuid</span> <span class="o">==</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;duplicate key value: uuid&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">}),</span> <span class="mi">500</span>
+    <span class="n">user_request</span> <span class="o">=</span> <span class="n">HandleNewUserRequest</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+                                        <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">user_request</span><span class="o">.</span><span class="n">image_processing</span><span class="p">()</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">user_request</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+    <span class="n">processed_number</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;data[3]&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+        <span class="n">file_identifier</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span>
+        <span class="n">original_color</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">8</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">UploadFiles</span><span class="p">(</span><span class="n">user_request</span><span class="o">.</span><span class="n">upload_file</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                            <span class="n">user_request</span><span class="o">.</span><span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                            <span class="n">user_request</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                            <span class="n">user_request</span><span class="o">.</span><span class="n">upload_time</span><span class="p">,</span> <span class="n">user_request</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
+                            <span class="n">index</span><span class="p">,</span> <span class="n">user_request</span><span class="o">.</span><span class="n">image_size_original</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                            <span class="kc">True</span><span class="p">,</span> <span class="n">file_identifier</span><span class="p">,</span> <span class="n">original_color</span><span class="p">)</span>
+        <span class="n">processed_file_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> \
+            <span class="n">user_request</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span> \
+            <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">processed_files</span> <span class="o">=</span> <span class="n">ProcessedImage</span><span class="p">(</span><span class="n">user_request</span><span class="o">.</span><span class="n">processing_type</span><span class="p">,</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">processing_time</span><span class="p">,</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">processed_file</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span>
+                                         <span class="n">upload_file_name</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                         <span class="n">user_request</span><span class="o">.</span>
+                                         <span class="n">image_size_processed</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                         <span class="n">processed_number</span><span class="p">,</span> <span class="n">processed_file_name</span><span class="p">,</span>
+                                         <span class="n">user_request</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">file_identifier</span><span class="p">)</span>
+        <span class="n">files</span><span class="o">.</span><span class="n">processedImage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">processed_files</span><span class="p">)</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">uploadFiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">]:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Successfully added and processed user request&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;file_names&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;file_name&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">][</span><span class="mi">0</span><span class="p">]}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;is validation error&quot;</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully added and processed user request files&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="add_new_processing_to_exist_user"><a class="viewcode-back" href="../index.html#server.add_new_processing_to_exist_user">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/update_user_request&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">add_new_processing_to_exist_user</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    add_new_processing_to_exit_user, update the user request on previous upload</span>
+<span class="sd">    when user has the same uuid</span>
+<span class="sd">    :return: message of successful update or error massage</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">second_validation</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user_uuid_list</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">list_id</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">user_uuid_list</span><span class="p">:</span>
+            <span class="n">list_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">list_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Can not find uuid&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">}),</span> <span class="mi">500</span>
+    <span class="n">query_processedimage</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ProcessedImage</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">ProcessedImage</span><span class="o">.</span><span class="n">user_uuid_processed</span> <span class="o">==</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">query_uploadfiles</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">UploadFiles</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">UploadFiles</span><span class="o">.</span><span class="n">user_uuid</span> <span class="o">==</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query_processedimage</span><span class="p">,</span> <span class="n">ProcessedImage</span><span class="p">):</span>
+        <span class="c1"># single processed image</span>
+        <span class="n">new_processed_number</span> <span class="o">=</span> <span class="n">query_processedimage</span><span class="o">.</span><span class="n">processed_number</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">pre_actions_HE</span> <span class="o">=</span> <span class="n">query_processedimage</span><span class="o">.</span><span class="n">num_HE</span>
+        <span class="n">pre_actions_CS</span> <span class="o">=</span> <span class="n">query_processedimage</span><span class="o">.</span><span class="n">num_CS</span>
+        <span class="n">pre_actions_RV</span> <span class="o">=</span> <span class="n">query_processedimage</span><span class="o">.</span><span class="n">num_RV</span>
+        <span class="n">pre_actions_LC</span> <span class="o">=</span> <span class="n">query_processedimage</span><span class="o">.</span><span class="n">num_LC</span>
+        <span class="n">pre_actions_GC</span> <span class="o">=</span> <span class="n">query_processedimage</span><span class="o">.</span><span class="n">num_GC</span>
+        <span class="n">last_processed_file_name</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">processed_file_name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">total_he</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">total_cs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">total_rv</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">total_lc</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">total_gc</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">number_max</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_processedimage</span><span class="p">:</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">processed_number</span><span class="p">)</span>
+            <span class="n">total_he</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">num_HE</span><span class="p">)</span>
+            <span class="n">total_cs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">num_CS</span><span class="p">)</span>
+            <span class="n">total_rv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">num_RV</span><span class="p">)</span>
+            <span class="n">total_lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">num_LC</span><span class="p">)</span>
+            <span class="n">total_gc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">num_GC</span><span class="p">)</span>
+            <span class="n">index_of_underscore</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">processed_file_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+            <span class="n">number_after</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">processed_file_name</span><span class="p">[</span><span class="n">index_of_underscore</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">number_after</span> <span class="o">&gt;</span> <span class="n">number_max</span><span class="p">:</span>
+                <span class="n">number_max</span> <span class="o">=</span> <span class="n">number_after</span>
+                <span class="n">pre_last_processed_file_name</span> <span class="o">=</span> \
+                    <span class="n">row</span><span class="o">.</span><span class="n">processed_file_name</span><span class="p">[:</span><span class="n">index_of_underscore</span><span class="p">]</span>
+        <span class="n">last_processed_file_name</span> <span class="o">=</span> <span class="n">pre_last_processed_file_name</span> <span class="o">+</span> \
+            <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_max</span><span class="p">)</span>
+        <span class="n">new_processed_number</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">total</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">pre_actions_HE</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">total_he</span><span class="p">)</span>
+        <span class="n">pre_actions_CS</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">total_cs</span><span class="p">)</span>
+        <span class="n">pre_actions_RV</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">total_rv</span><span class="p">)</span>
+        <span class="n">pre_actions_LC</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">total_lc</span><span class="p">)</span>
+        <span class="n">pre_actions_GC</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">total_gc</span><span class="p">)</span>
+    <span class="n">processing_index</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">old_upload_file</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">old_upload_file_type</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">old_upload_file_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">old_upload_file_identifier</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">processing_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_uploadfiles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">upload_file_name</span> <span class="o">==</span> <span class="n">i</span><span class="p">:</span>
+                <span class="n">old_upload_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">upload_file</span><span class="p">)</span>
+                <span class="n">old_upload_file_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">upload_file_type</span><span class="p">)</span>
+                <span class="n">old_upload_file_identifier</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">file_identifier</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">require_processing</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">update_ur</span> <span class="o">=</span> <span class="n">HandleNewUserRequest</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">old_upload_file</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                     <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">old_upload_file_type</span><span class="p">,</span>
+                                     <span class="n">processing_index</span><span class="p">,</span> <span class="n">old_upload_file_name</span><span class="p">)</span>
+    <span class="n">update_ur</span><span class="o">.</span><span class="n">image_processing</span><span class="p">()</span>
+    <span class="c1"># for number of file need to be processed</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_uploadfiles</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">fn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;fn&#39;</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;row.upload_file_name&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">:</span>
+                <span class="n">processed_files_name</span> <span class="o">=</span> <span class="n">last_processed_file_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">last_processed_file_name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;processed_files_name&#39;</span><span class="p">,</span> <span class="n">processed_files_name</span><span class="p">)</span>
+                <span class="n">file_id</span> <span class="o">=</span> <span class="n">old_upload_file_identifier</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+                <span class="n">processed_files</span> <span class="o">=</span> <span class="n">ProcessedImage</span><span class="p">(</span><span class="n">update_ur</span><span class="o">.</span><span class="n">processing_type</span><span class="p">,</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span><span class="n">processing_time</span><span class="p">,</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span>
+                                                 <span class="n">processed_file</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span>
+                                                 <span class="n">upload_file_type</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+                                                 <span class="n">pre_actions_HE</span><span class="p">,</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+                                                 <span class="n">pre_actions_CS</span><span class="p">,</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span>
+                                                 <span class="n">pre_actions_LC</span><span class="p">,</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span>
+                                                 <span class="n">pre_actions_RV</span><span class="p">,</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span><span class="n">actions</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span>
+                                                 <span class="n">pre_actions_GC</span><span class="p">,</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span>
+                                                 <span class="n">upload_file_name</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                                 <span class="n">update_ur</span><span class="o">.</span>
+                                                 <span class="n">image_size_processed</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                                 <span class="n">new_processed_number</span><span class="p">,</span>
+                                                 <span class="n">processed_files_name</span><span class="p">,</span>
+                                                 <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">file_id</span><span class="p">)</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">processed_files</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Successfully updated and processed user request&quot;</span><span class="p">}</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully updated and processed user request&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_processed_result"><a class="viewcode-back" href="../index.html#server.get_processed_result">[docs]</a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/get_processed_result/&lt;uuid&gt;&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">get_processed_result</span><span class="p">(</span><span class="n">uuid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get_processed_result gets the processed result from the</span>
+<span class="sd">    bme590finalproject database</span>
+<span class="sd">    :param uuid: user uuid</span>
+<span class="sd">    :return: lastest processed image information or error message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="n">info_uploadfiles</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">UploadFiles</span><span class="p">)</span> \
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">UploadFiles</span><span class="o">.</span><span class="n">user_uuid</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">info_processedimage</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ProcessedImage</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">ProcessedImage</span><span class="o">.</span><span class="n">user_uuid_processed</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">info_processedimage</span><span class="p">,</span> <span class="n">ProcessedImage</span><span class="p">):</span>
+        <span class="n">processed_img_index</span> <span class="o">=</span> <span class="n">info_processedimage</span><span class="o">.</span><span class="n">processed_number</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pro_num</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">info_processedimage</span><span class="p">:</span>
+            <span class="n">pro_num</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">processed_number</span><span class="p">)</span>
+        <span class="n">processed_img_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">pro_num</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ProcessedImage</span><span class="p">)</span><span class="o">.</span>\
+        <span class="nb">filter</span><span class="p">(</span><span class="n">ProcessedImage</span><span class="o">.</span><span class="n">user_uuid_processed</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">)</span> \
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ProcessedImage</span><span class="o">.</span><span class="n">processed_number</span> <span class="o">==</span> <span class="n">processed_img_index</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">out_processed_file</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">out_processed_image_size</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">out_original_image_size</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">out_processed_time</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">ProcessedImage</span><span class="p">):</span>
+        <span class="n">out_processed_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">processed_file</span><span class="p">)</span>
+        <span class="n">out_processed_image_size</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">q</span><span class="o">.</span><span class="n">image_size_processed_row</span><span class="p">,</span>
+                                         <span class="n">q</span><span class="o">.</span><span class="n">image_size_processed_column</span><span class="p">])</span>
+        <span class="n">out_processed_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">processing_time</span><span class="p">))</span>
+        <span class="n">out_original_image_size</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+            <span class="n">info_uploadfiles</span><span class="o">.</span><span class="n">image_size_original_row</span><span class="p">,</span>
+            <span class="n">info_uploadfiles</span><span class="o">.</span><span class="n">image_size_original_column</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">upload_fn</span> <span class="ow">in</span> <span class="n">info_uploadfiles</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">uploadFiles_upload_file_name</span> <span class="o">==</span> \
+                        <span class="n">upload_fn</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;row.uploadFiles_upload_file_name&quot;</span><span class="p">,</span>
+                          <span class="n">row</span><span class="o">.</span><span class="n">uploadFiles_upload_file_name</span><span class="p">)</span>
+                    <span class="n">out_processed_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">processed_file</span><span class="p">)</span>
+                    <span class="n">out_processed_image_size</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+                        <span class="n">row</span><span class="o">.</span><span class="n">image_size_processed_row</span><span class="p">,</span>
+                        <span class="n">row</span><span class="o">.</span><span class="n">image_size_processed_column</span><span class="p">])</span>
+                    <span class="n">out_processed_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">processing_time</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">info_uploadfiles</span><span class="p">:</span>
+            <span class="n">out_original_image_size</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">row</span><span class="o">.</span><span class="n">image_size_original_row</span><span class="p">,</span>
+                                            <span class="n">row</span><span class="o">.</span><span class="n">image_size_original_column</span><span class="p">])</span>
+    <span class="n">upload_file_type</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">upload_file_name</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">upload_file</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">upload_file_original</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">info_uploadfiles</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">uploadFiles_upload_file_name</span> <span class="o">==</span> <span class="n">o</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;o.upload_file_name&quot;</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">)</span>
+                <span class="n">upload_file_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">upload_file_type</span><span class="p">)</span>
+                <span class="n">upload_file_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">upload_file_name</span><span class="p">)</span>
+                <span class="n">upload_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">upload_file</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">upload_file_type</span> <span class="o">==</span> <span class="s2">&quot;tiff&quot;</span> <span class="ow">or</span> <span class="s2">&quot;tif&quot;</span> <span class="ow">or</span> <span class="s2">&quot;TIFF&quot;</span> <span class="ow">or</span> <span class="s2">&quot;tiff&quot;</span><span class="p">:</span>
+                    <span class="n">img1</span> <span class="o">=</span> <span class="n">decode_b64_image</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">original_color_image</span><span class="p">,</span>
+                                            <span class="n">o</span><span class="o">.</span><span class="n">upload_file_type</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="n">BytesIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">out_bytes</span><span class="p">:</span>
+                        <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">img1</span><span class="p">)</span>
+                        <span class="n">im2</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+                        <span class="n">ft</span> <span class="o">=</span> <span class="s1">&#39;JPEG&#39;</span>
+                        <span class="n">im2</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_bytes</span><span class="p">,</span> <span class="n">ft</span><span class="p">)</span>
+                        <span class="n">byte_data</span> <span class="o">=</span> <span class="n">out_bytes</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+                    <span class="n">img2</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">byte_data</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">img2</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">original_color_image</span>
+                <span class="n">upload_file_original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img2</span><span class="p">)</span>
+                <span class="n">upload_time</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">upload_time</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">to_ui</span><span class="p">(</span><span class="n">uuid</span><span class="p">,</span> <span class="n">out_processed_file</span><span class="p">,</span> <span class="n">upload_file_type</span><span class="p">,</span>
+                   <span class="n">upload_file_name</span><span class="p">,</span> <span class="n">upload_file</span><span class="p">,</span>
+                   <span class="n">out_original_image_size</span><span class="p">,</span> <span class="n">out_processed_image_size</span><span class="p">,</span>
+                   <span class="n">out_processed_time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                   <span class="n">upload_file_original</span><span class="p">,</span> <span class="n">upload_time</span><span class="p">)</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully get user uuid </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5001</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MedicalImageProcessor</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Angelina Liu Steven Hua Tina Wang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
