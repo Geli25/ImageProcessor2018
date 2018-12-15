@@ -85,5 +85,6 @@ _Files Required to run server.py_
           - histogram 
           - unit testing 
           - sphinx 
+          - all other assigned duties 
           
     
