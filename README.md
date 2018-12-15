@@ -3,7 +3,9 @@
 ##### Author: Steven Hua, Angelina Liu, Haitong Tina Wang 
 ##### Date: December 13, 2018 
 
-[![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)  
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ----
 
@@ -11,7 +13,7 @@ _This project is for BME 590 Medical Device Development class. The goal of this 
 is to build a user interface (front-end) and a server (back-end) RESTful API to allow 
 user to upload an image, a list of image or a zip file of JPEG/JPG, Tiff and PNG format to
 a web-server to perform image-processing tasks on the web-server, then display and download 
-the processed image._
+the processed image.
 
 ----
 
@@ -72,14 +74,14 @@ _Files Required to run server.py_
         
     1.3.2 REACT user interface
         
-  [Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine](https://github.com/Geli25/bme590final/tree/master/image-processing-gui)
+  [Please refer to image_processing_gui/README.md for detailed instruction on how to run app on local machine](https://github.com/Geli25/bme590final/tree/master/image-processing-gui)
         
 
 **1.4 Individual Contribution and Break down**
 
     1.4.1 Angelina Liu 
     
-          - all front end (react.js)
+          - all front end (React.js)
           
     1.4.2 Tina Haitong Wang 
     
