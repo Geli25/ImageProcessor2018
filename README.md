@@ -3,7 +3,7 @@
 ##### Author: Steven Hua, Angelina Liu, Haitong Tina Wang 
 ##### Date: December 13, 2018 
 
-[![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ----
 
