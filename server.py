@@ -336,6 +336,7 @@ def initial_new_image_processing():
     user = User(user_request.uuid)
     processed_number = 0
     count = 1
+    print("data[3]", data[3])
     for index in data[3]:
         file_identifier = data[6] + str(index) + '0'
         original_color = data[8][index]
@@ -372,6 +373,7 @@ def initial_new_image_processing():
     if not data[7]:
         result = {"message": "Successfully added and processed user request",
                   "file_names": data[2]}
+        print("file_name", data[2])
     else:
         result = {data[7][0]}
         print("is validation error")
@@ -427,7 +429,7 @@ def add_new_processing_to_exist_user():
             total_rv.append(row.num_RV)
             total_lc.append(row.num_LC)
             total_gc.append(row.num_GC)
-            index_of_underscore = row.processed_file_name.find("_")
+            index_of_underscore = row.processed_file_name.rfind("_")
             number_after = int(row.processed_file_name[index_of_underscore+1:])
             if number_after > number_max:
                 number_max = number_after
@@ -462,8 +464,9 @@ def add_new_processing_to_exist_user():
     # for number of file need to be processed
     for row in query_uploadfiles:
         for index, fn in enumerate(data[0]):
+            print('fn', fn)
+            print("row.upload_file_name", row.upload_file_name)
             if fn == row.upload_file_name:
-                print('last_prcessed_file_name', last_processed_file_name)
                 processed_files_name = last_processed_file_name[:-1] + \
                     str(int(last_processed_file_name[-1]) + index + 1)
                 print('processed_files_name', processed_files_name)
@@ -536,11 +539,17 @@ def get_processed_result(uuid):
             info_uploadfiles.image_size_original_row,
             info_uploadfiles.image_size_original_column])
     else:
-        for row in q:
-            out_processed_file.append(row.processed_file)
-            out_processed_image_size.append([row.image_size_processed_row,
-                                             row.image_size_processed_column])
-            out_processed_time.append(float(row.processing_time))
+        for upload_fn in info_uploadfiles:
+            for row in q:
+                if row.uploadFiles_upload_file_name == \
+                        upload_fn.upload_file_name:
+                    print("row.uploadFiles_upload_file_name",
+                          row.uploadFiles_upload_file_name)
+                    out_processed_file.append(row.processed_file)
+                    out_processed_image_size.append([
+                        row.image_size_processed_row,
+                        row.image_size_processed_column])
+                    out_processed_time.append(float(row.processing_time))
         for row in info_uploadfiles:
             out_original_image_size.append([row.image_size_original_row,
                                             row.image_size_original_column])
@@ -550,7 +559,8 @@ def get_processed_result(uuid):
     upload_file_original = []
     for o in info_uploadfiles:
         for b in q:
-            if o.upload_file_name == b.uploadFiles_upload_file_name:
+            if b.uploadFiles_upload_file_name == o.upload_file_name:
+                print("o.upload_file_name", o.upload_file_name)
                 upload_file_type.append(o.upload_file_type)
                 upload_file_name.append(o.upload_file_name)
                 upload_file.append(o.upload_file)
