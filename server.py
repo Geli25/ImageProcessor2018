@@ -377,7 +377,7 @@ def initial_new_image_processing():
                   "file_names": data[2]}
         print("file_name", data[2])
     else:
-        result = {data[7][0]}
+        result = {"file_names": data[2]}
         print("is validation error")
     session.close()
     print("Successfully added and processed user request files")
