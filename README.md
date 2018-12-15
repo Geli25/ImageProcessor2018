@@ -67,3 +67,23 @@ _Files Required to run server.py_
         
         Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine 
 
+**1.3 Individual Contribution and Break down 
+
+    1.3.1 Angelina Liu 
+    
+          - all front end (react.js)
+          
+    1.3.2 Tina Haitong Wang 
+    
+          - server
+          - image processing
+          - database 
+          
+    1.3.3 Steven Hua 
+        
+          - valdiation 
+          - histogram 
+          - unit testing 
+          - sphinx 
+          
+    
