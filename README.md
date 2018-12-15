@@ -13,6 +13,8 @@ the processed image._
 
 ----
 
+### Linked to deployed web server: https://bmetester-484d1.firebaseapp.com/
+
 **1.1 Content**
 
 _Files Required to run server.py_ 
@@ -59,9 +61,9 @@ _Files Required to run server.py_
 
     1.2.1 Database and VCM deployment 
         
-        Please refer to server_setup.md for detailed instruction on how to deploy on local server 
+        Please refer to server_setup.md for detailed instruction on how to deploy on local machine 
         
     1.2.2 REACT user interface
         
-        
+        Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine 
 
