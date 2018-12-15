@@ -68,7 +68,7 @@ _Files Required to run server.py_
 
     1.3.1 Database and VCM deployment 
         
-        [Please refer to server_setup.md for detailed instruction on how to deploy on local machine](https://github.com/Geli25/bme590final/blob/master/server_setup.md)
+[Please refer to server_setup.md for detailed instruction on how to deploy on local machine](https://github.com/Geli25/bme590final/blob/master/server_setup.md)
         
     1.3.2 REACT user interface
         
