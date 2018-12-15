@@ -8,7 +8,7 @@ const Results = props =>{
     return(
         <Fragment>
             <h4>This processing took a total of <b>{props.processingTime} seconds</b></h4>
-            <h5>Time of upload: {props.uploadTime}</h5>
+            <h5>Time of upload: {props.uploadTime.substr(0,props.uploadTime.length-3)}</h5>
             <br />
             <DownloadAllButton dlall={props.downloadAll} />
             <br />
