@@ -89,7 +89,7 @@ _Files Required to run server.py_
           
     1.4.3 Steven Hua 
         
-          - valdiation 
+          - validation
           - histogram 
           - unit testing 
           - sphinx 
