@@ -42,6 +42,9 @@ class Output extends Component {
     }
 
     componentDidMount(){
+        zipJ = new JSZip();
+        zipP = new JSZip();
+        zipT = new JSZip();
         this.props.setRedirect(false);
     }
 
@@ -114,6 +117,7 @@ class Output extends Component {
         //     }, 1000);
         // });
         this.setState({loading:true});
+        this.props.setLoading(true);
         axios.get('https://vcm-7506.vm.duke.edu:443/get_processed_result/' + this.props.uuid, {
             onDownloadProgress: progressEvent => {
                 let progressPercent = (progressEvent.loaded / progressEvent.total) * 100;
@@ -140,12 +144,14 @@ class Output extends Component {
                     this.processImages(response.data.img_pair, response.data.fileNames);
                     this.props.gotData(true);
                     this.props.refreshData(false);
-                    this.setState({ loading: false, percent: 0, color:"#FFA07A"})
+                    this.setState({ loading: false, percent: 0, color:"#FFA07A"});
+                    this.props.setLoading(false);
                 }
             }).catch(err=>{
                 console.log(err);
                 alert("Error:"+err);
-                this.setState({ loading: false, percent: 0, color:"#FFA07A"})
+                this.setState({ loading: false, percent: 0, color:"#FFA07A"});
+                this.props.setLoading(false);
                 this.resetApp();
             })
     }
@@ -159,15 +165,12 @@ class Output extends Component {
 
     zipFiles = (img64, name, type) => {
         if (type === "jpeg") {
-            zipJ=new JSZip();
             zipJ.file("processed_" + name, img64, { base64: true });
         }
         if (type === "png") {
-            zipP=new JSZip();
             zipP.file("processed_" + name, img64, { base64: true })
         }
         if (type === "tiff") {
-            zipT=new JSZip;
             zipT.file("processed_" + name, img64, { base64: true })
         }
     }
@@ -265,6 +268,7 @@ const mapDispatchtoProps=dispatch=>{
         setRedirect:(bool)=>dispatch(actionCreators.setRedirect(bool)),
         gotData:(bool)=>dispatch(actionCreators.gotData(bool)),
         resetApp:()=>dispatch(actionCreators.resetApp()),
+        setLoading:(bool)=>dispatch(actionCreators.setLoading(bool)),
         updateImagePairs:(pairs)=>dispatch(actionCreator.waitForProcessedImage(pairs)),
         updateImageSizes: (sizes) => dispatch(actionCreator.updateImageSizes(sizes)),
         updateProcessingTime:(time)=>dispatch(actionCreator.updateProcessingTime(time)),
