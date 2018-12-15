@@ -68,12 +68,7 @@ _This document is for setting up the postgres database and server.py on vcm
     gunicorn --bind 127.0.0.1:5001 server:app 
     
     or FLASK_APP=server.py flask run
-<<<<<<< HEAD
-
-  * This server is run on vcm-7506.vm.duke.edu
   
-=======
->>>>>>> 55da90563c0a49fc19f19c0f88e40cdb499cdc1a
 
   * This server is run on vcm-7506.vm.duke.edu
   
