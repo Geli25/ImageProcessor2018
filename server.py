@@ -556,7 +556,8 @@ def get_processed_result(uuid):
     upload_file_original = []
     for o in info_uploadfiles:
         for b in q:
-            if b.uploadFiles_upload_file_name == o.upload_file_name :
+            if b.uploadFiles_upload_file_name == o.upload_file_name:
+                print("o.upload_file_name", o.upload_file_name)
                 upload_file_type.append(o.upload_file_type)
                 upload_file_name.append(o.upload_file_name)
                 upload_file.append(o.upload_file)
