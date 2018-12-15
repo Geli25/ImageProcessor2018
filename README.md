@@ -5,7 +5,6 @@
 
 [![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)
 
-
 ----
 
 _This project is for BME 590 Medical Device Development class. The goal of this project 
@@ -69,11 +68,14 @@ _Files Required to run server.py_
 
     1.3.1 Database and VCM deployment 
         
-        Please refer to server_setup.md for detailed instruction on how to deploy on local machine 
+        Please refer to server_setup.md for detailed instruction on how to deploy on local machine
+        https://github.com/Geli25/bme590final/blob/master/server_setup.md
         
     1.3.2 REACT user interface
         
         Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine 
+        https://github.com/Geli25/bme590final/tree/master/image-processing-gui
+        
 
 **1.4 Individual Contribution and Break down**
 
