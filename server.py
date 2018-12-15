@@ -15,6 +15,7 @@ from io import BytesIO
 from validation import validate, second_validation
 from flask_cors import CORS
 from histogram import get_histogram
+from datetime import timezone
 
 """Main: this is the server.py file to build the entire
 image processing project
@@ -299,7 +300,8 @@ def to_ui(uuid, processed_file, upload_file_type, upload_file_name,
             "img_size": img_size_pair,
             "processed_time": processing_time,
             "fileNames": upload_file_name,
-            "upload_time": upload_time
+            "upload_time": upload_time.replace(tzinfo=timezone.utc)
+            .astimezone(tz=None)
             }
 
 
