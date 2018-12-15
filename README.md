@@ -67,7 +67,7 @@ _Files Required to run server.py_
         
         Please refer to image_processing_gui/README.md for detailed instruction on how to deploy on local machine 
 
-**1.3 Individual Contribution and Break down 
+**1.3 Individual Contribution and Break down**
 
     1.3.1 Angelina Liu 
     
