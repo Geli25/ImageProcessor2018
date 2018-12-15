@@ -1,0 +1,16 @@
+.instruction2{
+    width:60%;
+    margin:auto;
+}
+
+.checkbox{
+    margin-bottom:1em; 
+}
+
+.options{
+    margin-top:15px;
+}
+
+.options input{
+    margin-left:10px;
+}
