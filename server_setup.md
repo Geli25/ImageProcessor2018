@@ -1,10 +1,12 @@
 # BME 590 Final Project: Image Processor 
 
-##### Team member: Steven Hua, Angelina Liu, Haitong(Tina) Wang 
+##### Author: Haitong(Tina) Wang 
 ##### Date: December 13, 2018 
 
 ----
-_This document is for setting up the postgres database and server.py on vcm_
+_This document is for setting up the postgres database and server.py on vcm 
+ and local host._
+
 * ubuntu system 16.04  
 ----
 
@@ -31,13 +33,19 @@ _This document is for setting up the postgres database and server.py on vcm_
     
     DROP DATABASE bme590finalproject;
   
-  1.1.3 Check if postgres is active/ run  
+  1.1.3 Check if postgres is active/run and status 
   
     sudo systemctl stop postgresql.service
     sudo systemctl start postgresql.service
     sudo systemctl enable postgresql.service
     sudo systemctl status postgresql.service
 
+  1.1.4 Update server.py with USERNAME and PASSWORD 
+  
+    engine = create_engine("postgresql://{USERNAME}:{0}@localhost:5432/bme590"
+                           "finalproject".format({PASSWORD}), max_overflow=20,
+                           client_encoding='utf8')
+                                                   
 **1.2 VCM Deployment Instruction**  
 
     sudo apt-get install python3-pip screen
@@ -57,6 +65,10 @@ _This document is for setting up the postgres database and server.py on vcm_
   
     sudo ssl-proxy -from 0.0.0.0:443 -to 127.0.0.1:5001 -domain $YOUR_VCM_DOMAIN_NAME_HERE
   
-    gunicorn --bind 127.0.0.1:5001 server:app
+    gunicorn --bind 127.0.0.1:5001 server:app 
+    
+    or FLASK_APP=server.py flask run
 
+  * This server is run on vcm-7506.vm.duke.edu
+  
 
