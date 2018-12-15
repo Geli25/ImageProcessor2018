@@ -16,9 +16,9 @@ import Results from './Stateless/Results';
 import FileSaver from 'file-saver';
 import JSZip from 'jszip';
 
-let zipJ = new JSZip();
-let zipP = new JSZip();
-let zipT = new JSZip();
+let zipJ;
+let zipP;
+let zipT;
 
 class Output extends Component {
     state={
@@ -159,12 +159,15 @@ class Output extends Component {
 
     zipFiles = (img64, name, type) => {
         if (type === "jpeg") {
+            zipJ=new JSZip();
             zipJ.file("processed_" + name, img64, { base64: true });
         }
         if (type === "png") {
+            zipP=new JSZip();
             zipP.file("processed_" + name, img64, { base64: true })
         }
         if (type === "tiff") {
+            zipT=new JSZip;
             zipT.file("processed_" + name, img64, { base64: true })
         }
     }
