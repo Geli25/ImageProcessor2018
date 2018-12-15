@@ -3,6 +3,9 @@
 ##### Author: Steven Hua, Angelina Liu, Haitong Tina Wang 
 ##### Date: December 13, 2018 
 
+[![Build Status](https://travis-ci.org/Geli25/bme590final.svg?branch=master)](https://travis-ci.org/Geli25/bme590final)
+
+
 ----
 
 _This project is for BME 590 Medical Device Development class. The goal of this project 
