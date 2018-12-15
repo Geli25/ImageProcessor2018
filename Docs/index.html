@@ -1,0 +1,378 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="python">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Welcome to Medical Image Processor&#39;s documentation! &#8212; MedicalImageProcessor 0.0.1 documentation</title>
+    <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-medical-image-processor-s-documentation">
+<h1>Welcome to Medical Image Processor's documentation!<a class="headerlink" href="#welcome-to-medical-image-processor-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p><em>Angelina Liu</em>
+<em>Tina Wang</em>
+<em>Steven  Hua</em></p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+<div class="section" id="module-server">
+<span id="server-module"></span><h2>Server module<a class="headerlink" href="#module-server" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="server.encode_nparray_to_img">
+<code class="descclassname">server.</code><code class="descname">encode_nparray_to_img</code><span class="sig-paren">(</span><em>np_array</em>, <em>img_format</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#encode_nparray_to_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#server.encode_nparray_to_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>encode_nparray_to_img functions encodes the np_array processed
+img to a base64 for front end
+:param np_array: array of processed image
+:param img_format: image type, jpg, png, tiff
+:return: base64 encoded bytes string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.decode_b64_image">
+<code class="descclassname">server.</code><code class="descname">decode_b64_image</code><span class="sig-paren">(</span><em>base64_string</em>, <em>img_format</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#decode_b64_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#server.decode_b64_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>decode_b64_image decode bytes string into a np array of
+img
+:param base64_string: bytes string
+:param img_format: image type, jpg, png, tiff
+:return: decoded image in np array</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.to_ui">
+<code class="descclassname">server.</code><code class="descname">to_ui</code><span class="sig-paren">(</span><em>uuid</em>, <em>processed_file</em>, <em>upload_file_type</em>, <em>upload_file_name</em>, <em>upload_file</em>, <em>image_size_original</em>, <em>image_size_processed</em>, <em>processing_time</em>, <em>original_file</em>, <em>upload_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#to_ui"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#server.to_ui" title="Permalink to this definition">¶</a></dt>
+<dd><p>to_ui method generates return information
+to the front end</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.ValidationError">
+<code class="descclassname">server.</code><code class="descname">ValidationError</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#ValidationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#server.ValidationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>ValidationError class generate validation error messages
+to output</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.initial_new_image_processing">
+<code class="descclassname">server.</code><code class="descname">initial_new_image_processing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#initial_new_image_processing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#server.initial_new_image_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>/new_user_request allows to post a new user request
+:return: error if any error, or successfully add the new user request</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.add_new_processing_to_exist_user">
+<code class="descclassname">server.</code><code class="descname">add_new_processing_to_exist_user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#add_new_processing_to_exist_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#server.add_new_processing_to_exist_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>add_new_processing_to_exit_user, update the user request on previous upload
+when user has the same uuid
+:return: message of successful update or error massage</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.get_processed_result">
+<code class="descclassname">server.</code><code class="descname">get_processed_result</code><span class="sig-paren">(</span><em>uuid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#get_processed_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#server.get_processed_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>get_processed_result gets the processed result from the
+bme590finalproject database
+:param uuid: user uuid
+:return: lastest processed image information or error message</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-validation">
+<span id="validation-module"></span><h2>Validation module<a class="headerlink" href="#module-validation" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="validation.un_zip">
+<code class="descclassname">validation.</code><code class="descname">un_zip</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation.html#un_zip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.un_zip" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> -- The zip file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The directory after unzipping</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.image_turn_grey">
+<code class="descclassname">validation.</code><code class="descname">image_turn_grey</code><span class="sig-paren">(</span><em>image_file</em>, <em>image_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation.html#image_turn_grey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.image_turn_grey" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>image_file</strong> -- File to be turned grey,
+which can be encoded image or image file</li>
+<li><strong>image_type</strong> -- File type</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Encoded greyscale image file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.origin_image">
+<code class="descclassname">validation.</code><code class="descname">origin_image</code><span class="sig-paren">(</span><em>image_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation.html#origin_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.origin_image" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>image_file</strong> -- The original image file,
+which can be encoded image or image file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The encoded original image file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.traverse_dir">
+<code class="descclassname">validation.</code><code class="descname">traverse_dir</code><span class="sig-paren">(</span><em>path</em>, <em>my_data</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation.html#traverse_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.traverse_dir" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> -- Current path</li>
+<li><strong>my_data</strong> -- The data set</li>
+<li><strong>name</strong> -- File name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The upgraded data set after traversing the whole directory</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.add_name">
+<code class="descclassname">validation.</code><code class="descname">add_name</code><span class="sig-paren">(</span><em>access</em>, <em>file_name</em>, <em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation.html#add_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.add_name" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Synopsis:</th><td class="field-body"><p class="first">Add name to the data set without the duplicated names</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>access</strong> -- The data set</li>
+<li><strong>file_name</strong> -- The name of the file to be added</li>
+<li><strong>i</strong> -- The ordered number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Appended data set</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.validate">
+<code class="descclassname">validation.</code><code class="descname">validate</code><span class="sig-paren">(</span><em>database</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation.html#validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.validate" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Synopsis:</th><td class="field-body">Validate the input from the frond end and</td>
+</tr>
+</tbody>
+</table>
+<p>translate it into the data set to be processed
+:param database: The data uploaded by the frontend
+:return: A validated data set, which is a list of list.
+:data[0]: list of greyscale encoded image file
+:data[1]: list of image file types
+:data[2]: list of image file names
+:data[3]: list of image file indexes
+:data[4]: list of processing types
+:data[5]: upload time
+:data[6]: uuid
+:data[7]: list of Errors messages
+:data[8]: list of original encoded image files</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.second_validation">
+<code class="descclassname">validation.</code><code class="descname">second_validation</code><span class="sig-paren">(</span><em>new_database</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation.html#second_validation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.second_validation" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Synopsis:</th><td class="field-body">Validate the updated input from the frond end and</td>
+</tr>
+</tbody>
+</table>
+<p>translate it into the data set to be processed
+:param new_database: The updated data from the front end
+:return: A validated data set, which is a list of list.
+:new_data[0]: list of Selected File Names
+:new_data[1]: list of processing types
+:new_data[2]: upload time
+:new_data[3]: uuid</p>
+</dd></dl>
+
+</div>
+<div class="section" id="image-processing-module">
+<h2>Image Processing module<a class="headerlink" href="#image-processing-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-image_processing"></span><dl class="function">
+<dt id="image_processing.process_image">
+<code class="descclassname">image_processing.</code><code class="descname">process_image</code><span class="sig-paren">(</span><em>image</em>, <em>list_processing_method</em>, <em>actions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/image_processing.html#process_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#image_processing.process_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function process_image allows user to conduct the following
+image processing methods.
+Author: Haitong Wang
+Date: Dec, 7th, 2018
+Version: 1.0.0</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image</strong> -- 2d grayscale array</li>
+<li><strong>list_processing_method</strong> -- </li>
+<li><strong>actions</strong> -- array of integer indicates the number of</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>processing actions
+:return: output image/processed image, actions, size of
+the image</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-histogram">
+<span id="histogram-module"></span><h2>Histogram module<a class="headerlink" href="#module-histogram" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="histogram.is_grey">
+<code class="descclassname">histogram.</code><code class="descname">is_grey</code><span class="sig-paren">(</span><em>image_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/histogram.html#is_grey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#histogram.is_grey" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>image_file</strong> -- The image file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">1 if it is greyscale; Otherwise 0</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="histogram.get_histogram">
+<code class="descclassname">histogram.</code><code class="descname">get_histogram</code><span class="sig-paren">(</span><em>origin_image</em>, <em>processed_image</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/histogram.html#get_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#histogram.get_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>origin_image</strong> -- The original encoded image file</li>
+<li><strong>processed_image</strong> -- The processed encoded image file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The histogram data list to send to the front end</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">MedicalImageProcessor</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Angelina Liu Steven Hua Tina Wang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

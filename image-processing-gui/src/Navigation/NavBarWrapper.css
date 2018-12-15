@@ -1,0 +1,14 @@
+div{
+    margin:auto;
+    text-align:center;
+}
+
+.NavBar{
+    list-style: none;
+    font-size:19px;
+}
+
+.NavBar li{
+    display:inline;
+    margin:20%;
+}

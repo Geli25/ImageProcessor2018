@@ -1,0 +1,8 @@
+{
+  "short_name": "BME590Final",
+  "name": "Image Processor",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

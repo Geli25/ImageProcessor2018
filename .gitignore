@@ -13,3 +13,9 @@ env/
 .venv/
 .__pycache__/
 _build
+<<<<<<< HEAD
+=======
+image_processing.py
+server.py
+server_setup.md
+>>>>>>> dd26c681ce03c206be94cc1073882da2d3092d59

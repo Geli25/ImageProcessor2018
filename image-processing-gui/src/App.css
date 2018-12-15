@@ -1,0 +1,33 @@
+.App{
+    margin:auto;
+    text-align: center;
+    list-style: none;
+    z-index:0;
+}
+
+ul{
+    list-style: none;
+}
+
+.resetUI{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+    /* display:flex;
+    justify-content:center;
+    align-items:center; */
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.alertText{
+    margin-top:20%;
+    width:80%;
+}
+
+.alertButton button{
+    margin-right:2.5%;
+    margin-left:2.5%;
+}
