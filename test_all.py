@@ -1,5 +1,8 @@
-import pytest
 from validation import *
+import pytest
+from histogram import *
+import base64
+from image_processing import *
 
 
 @pytest.mark.parametrize("file_name, expected", [
@@ -118,3 +121,42 @@ def test_second_validation(new_database, expected):
 def test_add_name(access, file_name, expected):
     add_name(access, file_name, 0)
     assert access[2][-1] == expected
+
+
+@pytest.mark.parametrize("image_file, expected", [
+    ("test_histogram/1.png", 1),
+    ("test_histogram/2.png", 0),
+    ])
+def test_is_grey(image_file, expected):
+    with open(image_file, "rb") as image_file:
+        img = base64.b64encode(image_file.read())
+    src = base64.b64decode(img)
+    image_file = io.BytesIO(src)
+    response = is_grey(image_file)
+    assert response == expected
+
+
+@pytest.mark.parametrize("origin_image, processed_image, expected", [
+    ("test_histogram/2.png", "test_histogram/2.png", 2),
+    ("test_histogram/1.png", "test_histogram/2.png", 4),
+    ])
+def test_get_histogram(origin_image, processed_image, expected):
+    with open(origin_image, "rb") as image_file:
+        img_o = base64.b64encode(image_file.read())
+    with open(processed_image, "rb") as image_file:
+        img_n = base64.b64encode(image_file.read())
+    response = get_histogram(img_o, img_n)
+    assert len(response) == expected
+
+
+@pytest.mark.parametrize("image, list_processing_method, actions, expected", [
+    ("testImageProcessing/test.jpg", ["HE", "LC", "GC"],
+     [0, 0, 0, 0, 0], [1, 0, 1, 0, 1]),
+    ("testImageProcessing/test.jpg", ["CS", "RV"],
+     [0, 0, 0, 0, 0], [0, 1, 0, 1, 0]),
+    ])
+def test_image_processing(image, list_processing_method, actions, expected):
+    im = imread(image)
+    output, actions, size = process_image(im[:, :, 0],
+                                          list_processing_method, actions)
+    assert actions == expected
